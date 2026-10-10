@@ -1,7 +1,7 @@
 """模型档位与任务复杂度判定（方案文档 §6）。
 
 注意：本文件只定义「档位」，不定义「具体模型」。
-具体模型名在 profiles.py 留空待填。
+具体 provider / model / base_url 在 profiles.py 解析（可被环境变量覆盖）。
 """
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ class ModelSlot(str, Enum):
 
     REASONING = "reasoning"  # 高性能：设计 / 取舍 / 架构 / 根因分析
     FAST = "fast"            # 轻量：执行既定规范、批量替换、采集整理
+    VISION = "vision"        # 多模态：E6-QA 的多断点截图比对（未配置时自动降级为 reasoning）
 
 
 class ComplexityDimension(str, Enum):
@@ -36,7 +37,10 @@ class ComplexityInput(BaseModel):
 
 
 def judge_model_slot(profile: ComplexityInput) -> ModelSlot:
-    """按文档 §6.1 判定模型档位：任一维度偏复杂 -> 高性能，否则轻量。"""
+    """按文档 §6.1 判定模型档位：任一维度偏复杂 -> 高性能，否则轻量。
+
+    说明：视觉档（VISION）不参与自动判定，由角色在需要看图时显式指定。
+    """
     if (
         profile.needs_decision
         or profile.cross_scope
