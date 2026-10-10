@@ -1,0 +1,44 @@
+# ===== 环境变量与密钥：绝不提交 =====
+.env
+.env.local
+.env.*.local
+*.secret
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== 日志与临时产物 =====
+logs/
+*.log
+_verify_*.py
+_*.png
+
+# ===== 编辑器 / 系统 =====
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+# ===== 前端构建产物 / 依赖 =====
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# ===== 本地数据文件 =====
+mydb
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== 浏览器 / 验证临时产物 =====
+.agent-browser/
+_chrome.log
+frontend_optimizer/.probe/

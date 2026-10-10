@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>魔珐星云数字人 · 对话联动演示</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --line: #e3e2de;
+    --text: #23231f; --muted: #6f6e68; --accent: #185fa5;
+    --ok: #0f6e56; --warn: #854f0b; --err: #a32d2d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 14px; line-height: 1.6;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 18px; font-weight: 500; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px; margin-bottom: 14px;
+  }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  button {
+    font-family: inherit; font-size: 13px; padding: 7px 13px;
+    border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; color: var(--text); cursor: pointer;
+  }
+  button:hover:not(:disabled) { border-color: #c9c8c2; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.go { background: #0f6e56; border-color: #0f6e56; color: #fff; }
+  button:disabled { opacity: .42; cursor: not-allowed; }
+  #sdk {
+    width: 100%; max-width: 540px; aspect-ratio: 9 / 16; background: #101014;
+    border-radius: 10px; overflow: hidden; position: relative; margin: 0 auto;
+  }
+  #sdk .ph {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #8b8b93; font-size: 13px; text-align: center; padding: 20px;
+  }
+  textarea, input[type=text] {
+    width: 100%; padding: 9px; font-family: inherit; font-size: 13px;
+    border: 1px solid var(--line); border-radius: 8px; resize: vertical;
+  }
+  textarea { min-height: 70px; }
+  pre {
+    background: #f2f2ef; border-radius: 8px; padding: 9px; margin: 0;
+    font-size: 12px; max-height: 200px; overflow: auto; white-space: pre-wrap;
+    word-break: break-all; font-family: ui-monospace, Consolas, monospace;
+  }
+  .tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+  .tag.ok { color: var(--ok); border-color: #9fe1cb; background: #e1f5ee; }
+  .tag.err { color: var(--err); border-color: #f7c1c1; background: #fcebeb; }
+  .tag.warn { color: var(--warn); border-color: #ef9f27; background: #faeeda; }
+  .note {
+    border-left: 3px solid #ef9f27; background: #faeeda; color: var(--warn);
+    padding: 9px 11px; border-radius: 0 8px 8px 0; font-size: 13px;
+  }
+  .note.ok { border-color: #0f6e56; background: #e1f5ee; color: var(--ok); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .kv { display: grid; grid-template-columns: 130px 1fr; gap: 3px 10px; font-size: 13px; }
+  .kv span:nth-child(odd) { color: var(--muted); }
+  .chat { max-height: 190px; overflow: auto; }
+  .msg { padding: 7px 10px; border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+  .msg.u { background: #e6f1fb; }
+  .msg.b { background: #f2f2ef; }
+  .msg .who { font-size: 11px; color: var(--muted); display: block; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>魔珐星云数字人 · 对话联动演示</h1>
+  <div class="sub">你的客服引擎负责「想说什么」，星云负责「怎么说出来」——本页展示两者如何串起来。</div>
+
+  <div class="card">
+    <div class="row">
+      <button id="btnStatus">1. 检查后端配置</button>
+      <button id="btnInit" class="primary" disabled>2. 初始化数字人</button>
+      <span id="badge" class="tag">未检测</span>
+    </div>
+    <div class="kv" id="statusBox" style="margin-top:10px"><span>状态</span><span>点击左侧按钮开始</span></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div style="color:var(--muted);font-size:13px;margin-bottom:8px">数字人渲染容器</div>
+      <div id="sdk"><div class="ph" id="sdkPh">数字人渲染区（9:16）<br>初始化成功后显示 3D 数字人</div></div>
+      <div class="row" style="margin-top:10px">
+        <button id="btnIdle" disabled>待机互动</button>
+        <button id="btnOffline" disabled>离线省积分</button>
+        <button id="btnOnline" disabled>回到在线</button>
+        <button id="btnDestroy" disabled>销毁实例</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="color:var(--muted);font-size:13px;margin-bottom:8px">
+        对话（真实调用你的 <code>POST /api/chat</code>）
+      </div>
+      <div class="chat" id="chat"></div>
+      <input type="text" id="userInput" value="你好，我想问下我的订单" style="margin-bottom:8px">
+      <div class="row">
+        <button id="btnChat" class="go" disabled>发送并让数字人念出来</button>
+        <button id="btnChatOnly" disabled>只取回复不播报</button>
+      </div>
+      <div style="color:var(--muted);font-size:12px;margin-top:10px;margin-bottom:6px">
+        或手动输入要播报的文本：
+      </div>
+      <textarea id="speakText">欢迎使用电商小二智能客服。</textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="btnSpeak" disabled>直接播报这段文字</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="color:var(--muted);font-size:13px;margin-bottom:8px">运行日志</div>
+    <pre id="log"></pre>
+  </div>
+</div>
+
+<script>
+const API = "";              // 与后端同源时可留空
+let sdk = null;
+let cfg = null;
+
+const $ = (id) => document.getElementById(id);
+const log = (m) => {
+  const t = new Date().toLocaleTimeString();
+  $("log").textContent += `[${t}] ${m}\n`;
+  $("log").scrollTop = $("log").scrollHeight;
+};
+const setBadge = (t, c) => { const b = $("badge"); b.textContent = t; b.className = "tag" + (c ? " " + c : ""); };
+
+function loadSdk(url) {
+  return new Promise((res, rej) => {
+    if (window.XmovAvatar) return res();
+    if (!url) return rej(new Error("后端未返回 SDK 地址"));
+    const s = document.createElement("script");
+    s.src = url;
+    s.onload = () => res();
+    s.onerror = () => rej(new Error("SDK 脚本加载失败：" + url));
+    document.head.appendChild(s);
+  });
+}
+
+function addMsg(role, text) {
+  const d = document.createElement("div");
+  d.className = "msg " + (role === "user" ? "u" : "b");
+  d.innerHTML = `<span class="who">${role === "user" ? "用户" : "客服"}</span>${text}`;
+  $("chat").appendChild(d);
+  $("chat").scrollTop = $("chat").scrollHeight;
+}
+
+// ---- 1. 检查配置 ----------------------------------------------------------
+$("btnStatus").onclick = async () => {
+  try {
+    const d = await (await fetch(`${API}/api/avatar/status`)).json();
+    $("statusBox").innerHTML = Object.entries({
+      "开关 enabled": d.enabled,
+      "凭据齐备": d.credentials_ready,
+      "真正可用": d.usable,
+      "App ID（脱敏）": d.app_id_masked,
+      "允许密钥下发前端": d.secret_to_client_allowed,
+    }).map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join("");
+
+    if (!d.usable) { setBadge("不可用", "err"); return log("后端不可用，检查 .env 后重启服务。"); }
+    if (!d.secret_to_client_allowed) {
+      setBadge("需开启演示模式", "warn");
+      log("官方 SDK 的 appSecret 是必填参数，浏览器端初始化必须由后端下发。");
+      log("请在 .env 设 XMOV_ALLOW_SECRET_TO_CLIENT=true 并重启服务（仅本地演示）。");
+      return;
+    }
+    setBadge("配置就绪", "ok");
+    $("btnInit").disabled = false;
+    log("后端配置正常，可以初始化。");
+  } catch (e) { setBadge("后端未连通", "err"); log("请求失败：" + e.message); }
+};
+
+// ---- 2. 初始化 ------------------------------------------------------------
+$("btnInit").onclick = async () => {
+  $("btnInit").disabled = true;
+  try {
+    cfg = await (await fetch(`${API}/api/avatar/session`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ avatar_id: "default" }),
+    })).json();
+    log("拿到配置：avatar_id=" + cfg.avatar_id);
+    if (!cfg.app_secret) { setBadge("缺少密钥", "warn"); return log("后端未下发 appSecret。" + cfg.notice); }
+
+    await loadSdk(cfg.js_sdk_url);
+    log("SDK 已加载，创建实例 …");
+
+    sdk = new XmovAvatar({
+      containerId: "#sdk",
+      appId: cfg.app_id,
+      appSecret: cfg.app_secret,
+      gatewayServer: cfg.gateway_server,
+      onMessage: (m) => log("SDK 消息 code=" + m.code + " " + m.message),
+      onStateChange: (s) => log("状态变化：" + s),
+      onVoiceStateChange: (s) => { if (s === "voice_end") log("播报结束"); },
+      enableLogger: false,
+    });
+
+    await sdk.init({ onDownloadProgress: (p) => { if (p % 25 === 0) log("资源下载 " + p + "%"); } });
+    const ph = $("sdkPh"); if (ph) ph.style.display = "none";
+
+    log("初始化完成 ✅");
+    setBadge("已就绪", "ok");
+    ["btnIdle", "btnOffline", "btnOnline", "btnDestroy", "btnSpeak", "btnChat", "btnChatOnly"]
+      .forEach((i) => { $(i).disabled = false; });
+  } catch (e) {
+    log("初始化失败：" + e.message);
+    setBadge("初始化失败", "err");
+    $("btnInit").disabled = false;
+  }
+};
+
+// ---- 3. 驱动控制 ----------------------------------------------------------
+$("btnIdle").onclick = () => { sdk?.interactiveidle?.(); log("→ interactiveidle()"); };
+$("btnOffline").onclick = () => { sdk?.offlineMode?.(); log("→ offlineMode()（不消耗积分）"); };
+$("btnOnline").onclick = () => { sdk?.onlineMode?.(); log("→ onlineMode()"); };
+$("btnDestroy").onclick = () => {
+  sdk?.destroy?.(); sdk = null; log("→ destroy()");
+  ["btnIdle", "btnOffline", "btnOnline", "btnDestroy", "btnSpeak", "btnChat", "btnChatOnly"]
+    .forEach((i) => { $(i).disabled = true; });
+  $("btnInit").disabled = false;
+  setBadge("已销毁", "warn");
+};
+
+// ---- 4. 核心联动：/api/chat → 数字人播报 ---------------------------------
+function speakText(text) {
+  if (!sdk) return log("数字人尚未初始化。");
+  if (!text) return log("没有可播报的文本。");
+  // 官方签名：speak(ssml, is_start, is_end)。单段文本用 true/true 即可。
+  sdk.speak(text, true, true);
+  log(`→ speak("${text.slice(0, 24)}${text.length > 24 ? "…" : ""}")`);
+}
+
+$("btnSpeak").onclick = () => speakText($("speakText").value.trim());
+
+async function askChat(text, doSpeak) {
+  addMsg("user", text);
+  const d = await (await fetch(`${API}/api/chat`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sender_id: "avatar-demo", text }),
+  })).json();
+
+  const texts = (d.messages || []).map((m) => m.text).filter(Boolean);
+  if (!texts.length) { log("本轮没有文本回复（可能是对象类消息）。"); return; }
+
+  const reply = texts.join(" ");
+  addMsg("bot", reply);
+  if (doSpeak) {
+    // 建议两次 speak 之间插入待机切换，避免官方提示的「不允许连续调用」
+    sdk?.interactiveidle?.();
+    setTimeout(() => speakText(reply), 260);
+  }
+}
+
+$("btnChat").onclick = async () => {
+  const t = $("userInput").value.trim(); if (!t) return;
+  try { await askChat(t, true); } catch (e) { log("调用 /api/chat 失败：" + e.message); }
+};
+$("btnChatOnly").onclick = async () => {
+  const t = $("userInput").value.trim(); if (!t) return;
+  try { await askChat(t, false); } catch (e) { log("调用 /api/chat 失败：" + e.message); }
+};
+
+log("页面就绪。请先点「检查后端配置」。");
+log("若提示需开启演示模式，请设置 XMOV_ALLOW_SECRET_TO_CLIENT=true 后重启服务。");
+</script>
+</body>
+</html>

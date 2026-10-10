@@ -1,0 +1,26 @@
+:root {
+  /* 1. 主色与语义色 */
+  --color-primary: #1F4E79;
+  --color-success: #2E7D32;
+  --color-warning: #B7791F;
+  --color-danger: #C0392B;
+
+  /* 2. 中性色阶 */
+  --gray-50: #F7F8FA;
+  --gray-900: #1F2329;
+
+  /* 3. 背景与前景 */
+  --bg-base: #FFFFFF;
+  --bg-subtle: #F7F8FA;
+  --fg-base: #1F2329;
+  --fg-muted: #6B7280;
+
+  /* 4. 字体与字号 */
+  --font-sans: "PingFang SC", "Microsoft YaHei", sans-serif;
+  --text-sm: 14px;
+  --text-lg: 20px;
+
+  /* 5. 间距节奏 */
+  --space-4: 16px;
+  --space-6: 24px;
+}
