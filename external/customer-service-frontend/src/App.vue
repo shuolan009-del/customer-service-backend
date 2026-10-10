@@ -1300,13 +1300,16 @@ async function copyBotText(botMsg) {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+/* 字体改用系统栈：移除 fonts.googleapis.com 的 @import —— 该域名在国内访问不稳，
+   且 CSS @import 属于渲染阻塞资源，会拖慢首屏。 */
 
 :global(*) {
   box-sizing: border-box;
 }
 
 :global(:root) {
+  /* ── Typography ── */
+  --font-sans: "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
   /* ── Palette ── */
   --color-bg-deep: #070a14;
   --color-bg-mid: #0c1024;
@@ -1317,16 +1320,20 @@ async function copyBotText(botMsg) {
   --color-surface-dim: rgba(14, 16, 30, 0.60);
   --color-surface-raised: rgba(24, 26, 44, 0.70);
   --color-surface-field: rgba(10, 12, 22, 0.62);
-  /* Light text on dark surfaces */
-  --color-text-primary: #e6e3dc;
-  --color-text-secondary: #9b9790;
-  --color-text-muted: #726f68;
-  --color-text-inverse: #18171c;
-  /* Accent — teal */
+  /* Light text on dark surfaces（冷调中性色：与冷色背景同色温，不再发灰发脏） */
+  --color-text-primary: #e9edf6;
+  --color-text-secondary: #a4adc0;
+  --color-text-muted: #737d92;
+  --color-text-inverse: #0f1a17;
+  /* Accent — teal
+     新增 deep 两档：用于「大面积填充 + 白字」的场景。
+     原来的亮青 (#2dd4bf) 配白字对比度只有 1.9:1，远低于无障碍 AA 的 4.5:1。 */
   --color-accent: #2dd4bf;
   --color-accent-strong: #14b8a6;
+  --color-accent-deep: #0f766e;
+  --color-accent-deep-strong: #115e59;
   --color-accent-soft: rgba(45, 212, 191, 0.10);
-  --color-accent-glow: rgba(45, 212, 191, 0.20);
+  --color-accent-glow: rgba(45, 212, 191, 0.14);
   --color-accent-soft-bg: rgba(45, 212, 191, 0.06);
   /* Warm — amber */
   --color-warm: #f59e0b;
@@ -1346,18 +1353,18 @@ async function copyBotText(botMsg) {
   --color-border-light: rgba(255, 255, 255, 0.05);
   --color-border-strong: rgba(255, 255, 255, 0.13);
   /* ── Radii ── */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 28px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
   --radius-full: 9999px;
   /* ── Shadows (glow-based for dark theme) ── */
   --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.18);
   --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.22);
   --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.28);
   --shadow-lg: 0 20px 56px rgba(0, 0, 0, 0.35);
-  --shadow-glow-teal: 0 0 60px rgba(45, 212, 191, 0.10), 0 0 120px rgba(45, 212, 191, 0.04);
-  --shadow-glow-amber: 0 0 50px rgba(245, 158, 11, 0.08), 0 0 100px rgba(245, 158, 11, 0.03);
+  --shadow-glow-teal: 0 0 44px rgba(45, 212, 191, 0.07), 0 0 96px rgba(45, 212, 191, 0.03);
+  --shadow-glow-amber: 0 0 40px rgba(245, 158, 11, 0.06), 0 0 88px rgba(245, 158, 11, 0.02);
   --shadow-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   /* ── Transitions ── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -1370,7 +1377,7 @@ async function copyBotText(botMsg) {
 
 :global(body) {
   margin: 0;
-  font-family: "Outfit", "Zen Maru Gothic", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-sans);
   background: var(--color-bg-deep);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
@@ -1423,7 +1430,7 @@ async function copyBotText(botMsg) {
 /* Teal orb — top left */
 .app-shell::after {
   width: 820px; height: 820px;
-  background: radial-gradient(circle, rgba(13, 148, 136, 0.18) 0%, rgba(20, 184, 166, 0.06) 35%, transparent 70%);
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.13) 0%, rgba(20, 184, 166, 0.04) 35%, transparent 70%);
   top: -320px; left: -280px;
   animation: orb1 20s ease-in-out infinite;
 }
@@ -1435,7 +1442,7 @@ async function copyBotText(botMsg) {
   pointer-events: none;
   z-index: 0;
   width: 640px; height: 640px;
-  background: radial-gradient(circle, rgba(217, 119, 6, 0.13) 0%, rgba(245, 158, 11, 0.05) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.09) 0%, rgba(245, 158, 11, 0.035) 40%, transparent 70%);
   bottom: -280px; right: -220px;
   animation: orb2 24s ease-in-out infinite;
 }
@@ -1565,7 +1572,10 @@ async function copyBotText(botMsg) {
   margin: auto 0;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: #05070f;
+  /* 待机态：极淡的青色调渐变，避免未连接时呈现一整块死黑 */
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(45, 212, 191, 0.10), transparent 62%),
+    linear-gradient(180deg, #0a0f1c 0%, #070a14 100%);
   border: 1px solid var(--color-border-light);
 }
 
@@ -1587,7 +1597,21 @@ async function copyBotText(botMsg) {
   text-align: center;
   font-size: 13px;
   color: var(--color-text-secondary);
-  background: rgba(5, 7, 15, 0.88);
+  background: linear-gradient(180deg, rgba(6, 9, 17, 0.10) 0%, rgba(6, 9, 17, 0.55) 100%);
+}
+
+/* 待机装饰环（连接中显示转圈时不叠加） */
+.avatar-stage-mask::before {
+  content: "";
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 1px solid rgba(45, 212, 191, 0.26);
+  background: radial-gradient(circle at 50% 35%, rgba(45, 212, 191, 0.18), transparent 70%);
+  box-shadow: 0 0 32px rgba(45, 212, 191, 0.12);
+}
+.avatar-stage-mask:has(.avatar-spinner)::before {
+  display: none;
 }
 
 .avatar-stage-hint {
@@ -1666,7 +1690,7 @@ async function copyBotText(botMsg) {
 
 .chat-header,
 .sidebar-header {
-  padding: 24px 24px 16px;
+  padding: 20px 20px 14px;
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -1697,7 +1721,7 @@ async function copyBotText(botMsg) {
   font-size: 24px;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #f0ede6 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1705,7 +1729,7 @@ async function copyBotText(botMsg) {
 
 .sidebar-header h2 {
   font-size: 22px;
-  background: linear-gradient(135deg, #f0ede6 0%, var(--color-warm) 100%);
+  background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-warm) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1739,12 +1763,8 @@ async function copyBotText(botMsg) {
   border-radius: 50%;
   object-fit: cover;
   padding: 3px;
-  background: conic-gradient(var(--color-success), var(--color-accent), var(--color-warm), var(--color-success));
-  animation: avatarSpin 4s linear infinite;
-  box-shadow: 0 0 20px var(--color-accent-glow), 0 4px 12px var(--color-success-soft);
-}
-@keyframes avatarSpin {
-  to { transform: rotate(360deg); }
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-deep));
+  box-shadow: 0 0 18px var(--color-accent-glow), 0 4px 12px rgba(0, 0, 0, 0.28);
 }
 
 .status-indicator {
@@ -1814,8 +1834,8 @@ async function copyBotText(botMsg) {
 .controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -1833,7 +1853,14 @@ async function copyBotText(botMsg) {
 
 .field-row {
   display: flex;
-  gap: 12px;
+  align-items: stretch;
+  gap: 10px;
+}
+
+/* 输入框 width:100% 会在 flex 行里把按钮挤到换行，这里改成弹性宽度 */
+.field-row input {
+  flex: 1 1 auto;
+  width: auto;
 }
 
 .field input,
@@ -1866,10 +1893,10 @@ async function copyBotText(botMsg) {
   min-height: 0;
   overflow-y: auto;
   scrollbar-gutter: stable;
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* Turn 卡片样式 */
@@ -1923,12 +1950,12 @@ async function copyBotText(botMsg) {
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: linear-gradient(135deg, var(--color-accent), #0d9488);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-accent-deep), var(--color-accent-deep-strong));
+  color: #d6fbf2;
   font-size: 12px;
   font-weight: 600;
   border-radius: var(--radius-sm);
-  box-shadow: 0 2px 12px var(--color-accent-glow);
+  box-shadow: 0 2px 12px rgba(15, 118, 110, 0.28);
 }
 
 .turn-label {
@@ -2051,10 +2078,11 @@ async function copyBotText(botMsg) {
 }
 
 .user-bubble {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
-  border: 1px solid transparent;
+  /* 深青渐变：白字对比度由 1.9:1 提升到约 5.5:1（无障碍 AA 达标） */
+  background: linear-gradient(135deg, var(--color-accent-deep), var(--color-accent-deep-strong));
+  border: 1px solid rgba(255, 255, 255, 0.10);
   color: #ffffff;
-  box-shadow: 0 4px 18px var(--color-accent-glow);
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.22);
   margin-left: auto;
   max-width: 85%;
 }
@@ -2152,9 +2180,8 @@ async function copyBotText(botMsg) {
   width: 88px; height: 88px;
   border-radius: 50%;
   padding: 4px;
-  background: conic-gradient(var(--color-success), var(--color-accent), var(--color-warm), var(--color-success));
-  animation: avatarSpin 4s linear infinite;
-  box-shadow: 0 0 36px var(--color-accent-glow);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-deep));
+  box-shadow: 0 0 30px var(--color-accent-glow);
 }
 .welcome-status-pulse {
   position: absolute;
@@ -2170,7 +2197,7 @@ async function copyBotText(botMsg) {
   margin: 0 0 8px;
   font-size: 26px;
   font-weight: 700;
-  background: linear-gradient(135deg, #f0ede6, var(--color-accent));
+  background: linear-gradient(135deg, var(--color-text-primary), var(--color-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2274,10 +2301,65 @@ async function copyBotText(botMsg) {
   color: var(--color-text-muted);
 }
 
-.object-card-price {
-  font-size: 15px;
-  font-weight: 600;
+/* ── 对象卡片（聊天区的订单 / 商品卡片）─────────────────────────
+   此前只写了 .object-card-price，卡片本体、徽章、标题、字段全都无样式，
+   在气泡里表现为一串裸文字。这里补齐完整一套。 */
+.object-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: fit-content;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
 }
+
+.object-card-badge {
+  align-self: flex-start;
+  padding: 2px 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.object-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.object-card-meta {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.object-card-price {
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-warm);
+}
+
+/* 用户气泡内的对象卡片（深青底，文字需为白色系） */
+.user-bubble .object-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+.user-bubble .object-card-badge {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+.user-bubble .object-card-title { color: #ffffff; }
+.user-bubble .object-card-meta { color: rgba(255, 255, 255, 0.78); }
+.user-bubble .object-card-price { color: #ffffff; }
 
 /* ── 状态徽章 ────────────────────────────────────────────── */
 .status-badge {
@@ -2318,7 +2400,7 @@ async function copyBotText(botMsg) {
 /* ── 商品图片（侧边栏） ────────────────────────────────────── */
 .card-image-wrapper {
   width: 100%;
-  height: 140px;
+  height: 104px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-field);
@@ -2344,22 +2426,12 @@ async function copyBotText(botMsg) {
 /* ── 对象卡片图片（聊天区） ─────────────────────────────────── */
 .object-card-image {
   width: 100%;
-  height: 150px;
+  height: 120px;
   object-fit: cover;
   border-radius: var(--radius-sm);
   margin-bottom: 8px;
   border: 1px solid var(--color-border-light);
   background: var(--color-surface-field);
-}
-
-/* Turn 卡片中的对象卡片样式调整 */
-.turn-bubble .object-card {
-  min-width: 200px;
-}
-
-.user-bubble .object-card-badge {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
 }
 
 .composer button,
@@ -2375,6 +2447,7 @@ async function copyBotText(botMsg) {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
+  white-space: nowrap;
   transition:
     transform var(--duration-fast) var(--ease-out-expo),
     box-shadow var(--duration-fast) var(--ease-out-expo),
@@ -2416,8 +2489,8 @@ async function copyBotText(botMsg) {
   flex-shrink: 0;
   display: flex;
   align-items: stretch;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 16px 20px;
   border-top: 1px solid var(--color-border-light);
   background: var(--color-surface-dim);
 }
@@ -2427,23 +2500,19 @@ async function copyBotText(botMsg) {
   padding-inline: 20px;
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
   border-color: transparent;
-  color: #f0fdfa;
-  box-shadow: 0 14px 28px var(--color-accent-glow);
+  /* 亮青底用深色字：对比度约 9.9:1；白字只有 1.9:1 */
+  color: var(--color-text-inverse);
+  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.20);
 }
 .composer button:hover:not(:disabled) {
-  box-shadow: 0 18px 36px var(--color-accent-glow);
-  transform: translateY(-2px);
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 14px 28px rgba(20, 184, 166, 0.26);
+  transform: translateY(-1px);
 }
 
 .tabs {
   display: flex;
   gap: 8px;
-  padding: 16px 24px 12px;
+  padding: 14px 20px 10px;
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -2452,9 +2521,9 @@ async function copyBotText(botMsg) {
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, var(--color-accent-strong), var(--color-accent));
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
   border-color: transparent;
-  color: #f0fdfa;
+  color: var(--color-text-inverse);
   box-shadow: 0 4px 14px var(--color-accent-glow);
 }
 
@@ -2462,20 +2531,20 @@ async function copyBotText(botMsg) {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 24px 24px;
+  padding: 14px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .sidebar-card {
-  padding: 16px;
+  padding: 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   transition: all var(--duration-base) var(--ease-out-expo);
 }
 .sidebar-card:hover {
@@ -2593,22 +2662,34 @@ async function copyBotText(botMsg) {
   min-height: 42px;
 }
 
-.sidebar-empty {
-  margin: auto;
-  max-width: 420px;
-  color: var(--color-text-muted);
-  text-align: center;
-  line-height: 1.7;
+/* ── 滚动条 / 键盘焦点（细节打磨）─────────────────────────────── */
+.messages,
+.sidebar-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+.messages::-webkit-scrollbar,
+.sidebar-list::-webkit-scrollbar {
+  width: 8px;
+}
+.messages::-webkit-scrollbar-track,
+.sidebar-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.messages::-webkit-scrollbar-thumb,
+.sidebar-list::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.14);
+}
+.messages::-webkit-scrollbar-thumb:hover,
+.sidebar-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
 }
 
-/* Turn 卡片中的对象卡片样式调整 */
-.turn-bubble .object-card {
-  min-width: 200px;
-}
-
-.user-bubble .object-card-badge {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+/* 键盘操作时的焦点可见（此前只有鼠标 hover 态） */
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1180px) {
