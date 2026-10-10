@@ -42,3 +42,6 @@ mydb
 .agent-browser/
 _chrome.log
 frontend_optimizer/.probe/
+
+# ===== 前端优化多智能体流水线运行产物（本地留存，不提交）=====
+docs/frontend-optimizer/workspace/
