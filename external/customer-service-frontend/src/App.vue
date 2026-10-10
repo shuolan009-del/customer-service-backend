@@ -1309,63 +1309,71 @@ async function copyBotText(botMsg) {
 
 :global(:root) {
   /* ── Typography ── */
-  --font-sans: "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
-  /* ── Palette ── */
-  --color-bg-deep: #070a14;
-  --color-bg-mid: #0c1024;
-  --color-bg-surface: #11162b;
-  /* Dark frosted glass — emerges from background, doesn't sit on top */
-  --color-surface: rgba(14, 16, 30, 0.78);
-  --color-surface-hover: rgba(20, 22, 38, 0.86);
-  --color-surface-dim: rgba(14, 16, 30, 0.60);
-  --color-surface-raised: rgba(24, 26, 44, 0.70);
-  --color-surface-field: rgba(10, 12, 22, 0.62);
-  /* Light text on dark surfaces（冷调中性色：与冷色背景同色温，不再发灰发脏） */
-  --color-text-primary: #e9edf6;
-  --color-text-secondary: #a4adc0;
-  --color-text-muted: #737d92;
-  --color-text-inverse: #0f1a17;
-  /* Accent — teal
-     新增 deep 两档：用于「大面积填充 + 白字」的场景。
-     原来的亮青 (#2dd4bf) 配白字对比度只有 1.9:1，远低于无障碍 AA 的 4.5:1。 */
-  --color-accent: #2dd4bf;
-  --color-accent-strong: #14b8a6;
-  --color-accent-deep: #0f766e;
-  --color-accent-deep-strong: #115e59;
-  --color-accent-soft: rgba(45, 212, 191, 0.10);
-  --color-accent-glow: rgba(45, 212, 191, 0.14);
-  --color-accent-soft-bg: rgba(45, 212, 191, 0.06);
-  /* Warm — amber */
-  --color-warm: #f59e0b;
-  --color-warm-strong: #d97706;
-  --color-warm-soft: rgba(245, 158, 11, 0.10);
-  --color-warm-glow: rgba(245, 158, 11, 0.18);
-  --color-warm-soft-bg: rgba(245, 158, 11, 0.05);
-  /* Semantic */
-  --color-success: #34d399;
-  --color-success-soft: rgba(52, 211, 153, 0.12);
-  --color-info: #38bdf8;
-  --color-info-soft: rgba(56, 189, 248, 0.10);
-  --color-danger: #fb7185;
-  --color-danger-soft: rgba(251, 113, 133, 0.10);
-  /* Borders — subtle light lines on dark glass */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-light: rgba(255, 255, 255, 0.05);
-  --color-border-strong: rgba(255, 255, 255, 0.13);
-  /* ── Radii ── */
+  --font-sans: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --text-sm: 14px;
+  --text-lg: 20px;
+  /* ── Spacing ── */
+  --space-4: 16px;
+  --space-6: 24px;
+  /* ── Palette（京东客服工作台：浅色白底 + 京东红） ── */
+  --color-bg-deep: #FFFFFF;
+  --color-bg-mid: #FFFFFF;
+  --color-bg-surface: #F7F8FA;
+  --color-bg-subtle: #F7F8FA;
+  --color-gray-50: #F7F8FA;
+  --color-gray-900: #1F2329;
+  /* 浅色商务底：白卡片 + 浅灰次级底 */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F7F8FA;
+  --color-surface-dim: #F7F8FA;
+  --color-surface-raised: #F7F8FA;
+  --color-surface-field: #FFFFFF;
+  /* 深色文字用于浅色底 */
+  --color-text-primary: #1F2329;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #6B7280;
+  --color-text-inverse: #FFFFFF;
+  /* Accent — 京东红（主色 #E1251B，深压 #C81623）
+     大面积填充配白字：对比度约 4.7:1，满足无障碍 AA。 */
+  --color-accent: #E1251B;
+  --color-accent-strong: #C81623;
+  --color-accent-deep: #E1251B;
+  --color-accent-deep-strong: #C81623;
+  --color-accent-soft: rgba(225, 37, 27, 0.10);
+  --color-accent-glow: rgba(225, 37, 27, 0.14);
+  --color-accent-soft-bg: rgba(225, 37, 27, 0.06);
+  /* Warm — 暖黄（推断色 #B7791F） */
+  --color-warm: #B7791F;
+  --color-warm-strong: #B7791F;
+  --color-warm-soft: rgba(183, 121, 31, 0.10);
+  --color-warm-glow: rgba(183, 121, 31, 0.18);
+  --color-warm-soft-bg: rgba(183, 121, 31, 0.06);
+  /* Semantic（success / danger 取自冻结规范；info 规范未给出，用 fg_muted 中性灰） */
+  --color-success: #2E7D32;
+  --color-success-soft: rgba(46, 125, 50, 0.10);
+  --color-info: #6B7280;
+  --color-info-soft: rgba(107, 114, 128, 0.10);
+  --color-danger: #C81623;
+  --color-danger-soft: rgba(200, 22, 35, 0.10);
+  /* Borders — 浅色底分隔线：fg_base 低透明度叠加，不引入新色相 */
+  --color-border: rgba(31, 35, 41, 0.12);
+  --color-border-light: rgba(31, 35, 41, 0.06);
+  --color-border-strong: rgba(31, 35, 41, 0.20);
+  /* ── Radii — 统一克制圆角 8px，去除超大圆角 ── */
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 22px;
-  --radius-full: 9999px;
-  /* ── Shadows (glow-based for dark theme) ── */
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.18);
-  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.22);
-  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 20px 56px rgba(0, 0, 0, 0.35);
-  --shadow-glow-teal: 0 0 44px rgba(45, 212, 191, 0.07), 0 0 96px rgba(45, 212, 191, 0.03);
-  --shadow-glow-amber: 0 0 40px rgba(245, 158, 11, 0.06), 0 0 88px rgba(245, 158, 11, 0.02);
-  --shadow-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-full: 8px;
+  /* ── Shadows — 轻量化投影，无毛玻璃 ── */
+  --shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* 旧「光晕」变量名保留，值收敛为统一卡片投影，避免已有多处引用失效 */
+  --shadow-glow-teal: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-glow-amber: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-inner-glow: 0 2px 8px rgba(0, 0, 0, 0.08);
   /* ── Transitions ── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1378,7 +1386,8 @@ async function copyBotText(botMsg) {
 :global(body) {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--color-bg-deep);
+  font-size: var(--text-sm);
+  background: var(--color-bg-surface);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1395,74 +1404,21 @@ async function copyBotText(botMsg) {
 
 .app-shell {
   min-height: 100vh;
-  padding: 24px;
+  padding: var(--space-6);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(165deg, #070a14 0%, #0c1024 25%, #0a0f1f 50%, #0c1024 75%, #080d1c 100%);
-  background-size: 400% 400%;
-  animation: bgShift 24s ease-in-out infinite;
+  background: var(--color-bg-surface);
 }
-/* Subtle grain texture overlay */
-.app-shell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.028;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
+/* 商务风格：去掉颗粒噪点纹理与彩色光晕球，只保留极淡的粒子画布 */
 .bg-canvas {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* 粒子颜色由脚本生成的深色调，浅色底上整体压低不透明度：保留装饰，不抢视线 */
+  opacity: 0.3;
 }
-
-.app-shell::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-}
-/* Teal orb — top left */
-.app-shell::after {
-  width: 820px; height: 820px;
-  background: radial-gradient(circle, rgba(13, 148, 136, 0.13) 0%, rgba(20, 184, 166, 0.04) 35%, transparent 70%);
-  top: -320px; left: -280px;
-  animation: orb1 20s ease-in-out infinite;
-}
-/* Amber orb — bottom right */
-.workspace::before {
-  content: "";
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  width: 640px; height: 640px;
-  background: radial-gradient(circle, rgba(217, 119, 6, 0.09) 0%, rgba(245, 158, 11, 0.035) 40%, transparent 70%);
-  bottom: -280px; right: -220px;
-  animation: orb2 24s ease-in-out infinite;
-}
-
-@keyframes bgShift {
-  0%, 100% { background-position: 0% 0%; }
-  25% { background-position: 100% 0%; }
-  50% { background-position: 100% 100%; }
-  75% { background-position: 0% 100%; }
-}
-@keyframes orb1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(140px, 90px) scale(1.22); }
-  66% { transform: translate(-50px, 150px) scale(0.82); }
-}
-@keyframes orb2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-110px, -70px) scale(1.18); }
-  66% { transform: translate(70px, -130px) scale(0.88); }
-}
+/* 商务风格：去掉背景位移与光晕动画，背景保持静态浅色 */
 
 .workspace {
   width: min(1760px, 100%);
@@ -1479,28 +1435,26 @@ async function copyBotText(botMsg) {
   min-height: calc(100vh - 48px);
   height: calc(100vh - 48px);
   background: var(--color-surface);
-  backdrop-filter: blur(32px) saturate(1.2);
-  -webkit-backdrop-filter: blur(32px) saturate(1.2);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  transition: border-color var(--duration-slow) var(--ease-in-out), box-shadow var(--duration-slow) var(--ease-in-out);
+  transition: border-color var(--duration-base) var(--ease-in-out), box-shadow var(--duration-base) var(--ease-in-out);
 }
 .chat-card {
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-glow-teal), var(--shadow-lg), var(--shadow-inner-glow);
+  box-shadow: var(--shadow-sm);
 }
 .chat-card:hover {
-  border-color: rgba(45, 212, 191, 0.15);
+  border-color: var(--color-border-strong);
 }
 .sidebar {
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-glow-amber), var(--shadow-lg), var(--shadow-inner-glow);
+  box-shadow: var(--shadow-sm);
 }
 .sidebar:hover {
-  border-color: rgba(245, 158, 11, 0.15);
+  border-color: var(--color-border-strong);
 }
 
 /* ── 数字人面板 ─────────────────────────────────────────────────── */
@@ -1509,19 +1463,17 @@ async function copyBotText(botMsg) {
   height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px 16px;
+  gap: var(--space-4);
+  padding: 20px var(--space-4);
   background: var(--color-surface);
-  backdrop-filter: blur(32px) saturate(1.2);
-  -webkit-backdrop-filter: blur(32px) saturate(1.2);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-glow-teal), var(--shadow-lg), var(--shadow-inner-glow);
-  transition: border-color var(--duration-slow) var(--ease-in-out), box-shadow var(--duration-slow) var(--ease-in-out);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-base) var(--ease-in-out), box-shadow var(--duration-base) var(--ease-in-out);
 }
 
 .avatar-panel:hover {
-  border-color: rgba(45, 212, 191, 0.15);
+  border-color: var(--color-border-strong);
 }
 
 .avatar-panel-header {
@@ -1551,13 +1503,13 @@ async function copyBotText(botMsg) {
 
 .avatar-status.is-ready {
   color: var(--color-success);
-  border-color: rgba(52, 211, 153, 0.35);
+  border-color: var(--color-success);
   background: var(--color-success-soft);
 }
 
 .avatar-status.is-loading {
   color: var(--color-warm);
-  border-color: rgba(245, 158, 11, 0.35);
+  border-color: var(--color-warm);
   background: var(--color-warm-soft);
 }
 
@@ -1572,10 +1524,10 @@ async function copyBotText(botMsg) {
   margin: auto 0;
   border-radius: var(--radius-md);
   overflow: hidden;
-  /* 待机态：极淡的青色调渐变，避免未连接时呈现一整块死黑 */
+  /* 待机态：白底 + 极淡主色顶光，避免未连接时呈现一整块死黑 */
   background:
-    radial-gradient(120% 80% at 50% 0%, rgba(45, 212, 191, 0.10), transparent 62%),
-    linear-gradient(180deg, #0a0f1c 0%, #070a14 100%);
+    radial-gradient(120% 80% at 50% 0%, var(--color-accent-soft-bg), transparent 62%),
+    linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg-surface) 100%);
   border: 1px solid var(--color-border-light);
 }
 
@@ -1597,7 +1549,7 @@ async function copyBotText(botMsg) {
   text-align: center;
   font-size: 13px;
   color: var(--color-text-secondary);
-  background: linear-gradient(180deg, rgba(6, 9, 17, 0.10) 0%, rgba(6, 9, 17, 0.55) 100%);
+  background: linear-gradient(180deg, transparent 0%, var(--color-bg-surface) 100%);
 }
 
 /* 待机装饰环（连接中显示转圈时不叠加） */
@@ -1606,9 +1558,9 @@ async function copyBotText(botMsg) {
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  border: 1px solid rgba(45, 212, 191, 0.26);
-  background: radial-gradient(circle at 50% 35%, rgba(45, 212, 191, 0.18), transparent 70%);
-  box-shadow: 0 0 32px rgba(45, 212, 191, 0.12);
+  border: 1px solid var(--color-border);
+  background: radial-gradient(circle at 50% 35%, var(--color-accent-soft), transparent 70%);
+  box-shadow: var(--shadow-sm);
 }
 .avatar-stage-mask:has(.avatar-spinner)::before {
   display: none;
@@ -1623,7 +1575,7 @@ async function copyBotText(botMsg) {
 .avatar-spinner {
   width: 22px;
   height: 22px;
-  border: 2px solid rgba(45, 212, 191, 0.25);
+  border: 2px solid var(--color-border);
   border-top-color: var(--color-accent);
   border-radius: 50%;
   animation: avatarLoadingSpin 0.9s linear infinite;
@@ -1636,35 +1588,36 @@ async function copyBotText(botMsg) {
 .avatar-progress {
   flex-shrink: 0;
   height: 4px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: var(--color-border-light);
   overflow: hidden;
 }
 
 .avatar-progress-bar {
   height: 100%;
   background: var(--color-accent);
-  transition: width 0.3s var(--ease-out-expo);
+  transition: width var(--duration-slow) var(--ease-out-expo);
 }
 
 .avatar-connect-button {
   flex-shrink: 0;
   width: 100%;
-  padding: 11px 16px;
+  padding: 11px var(--space-4);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(45, 212, 191, 0.35);
+  border: 1px solid var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-accent);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-base) var(--ease-out-expo);
 }
 
 .avatar-connect-button:hover:not(:disabled) {
-  background: rgba(45, 212, 191, 0.18);
-  border-color: rgba(45, 212, 191, 0.5);
+  background: var(--color-accent);
+  border-color: var(--color-accent-strong);
+  color: var(--color-text-inverse);
 }
 
 .avatar-connect-button:disabled {
@@ -1718,21 +1671,15 @@ async function copyBotText(botMsg) {
 .chat-header h1,
 .sidebar-header h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: var(--text-lg);
   line-height: 1.2;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text-primary);
 }
 
 .sidebar-header h2 {
-  font-size: 22px;
-  background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-warm) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
 }
 
 .chat-header p,
@@ -1763,8 +1710,8 @@ async function copyBotText(botMsg) {
   border-radius: 50%;
   object-fit: cover;
   padding: 3px;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-deep));
-  box-shadow: 0 0 18px var(--color-accent-glow), 0 4px 12px rgba(0, 0, 0, 0.28);
+  background: var(--color-accent);
+  box-shadow: var(--shadow-xs);
 }
 
 .status-indicator {
@@ -1774,7 +1721,7 @@ async function copyBotText(botMsg) {
   width: 14px;
   height: 14px;
   background: var(--color-success);
-  border: 3px solid #ffffff;
+  border: 3px solid var(--color-surface);
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
@@ -1824,11 +1771,10 @@ async function copyBotText(botMsg) {
   white-space: nowrap;
 }
 .clear-button:hover {
-  background: rgba(251, 113, 133, 0.10);
+  background: var(--color-danger-soft);
   border-color: var(--color-danger);
   color: var(--color-danger);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 18px var(--color-danger-soft);
+  box-shadow: var(--shadow-xs);
 }
 
 .controls {
@@ -1918,24 +1864,11 @@ async function copyBotText(botMsg) {
   from { opacity: 0; transform: translateY(24px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.turn-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
-  transition: left 0.5s ease;
-  pointer-events: none;
-  z-index: 2;
-}
-.turn-card:hover::before {
-  left: 100%;
-}
+/* 商务风格：去掉卡片高光扫过动效，hover 只保留轻投影 */
 .turn-card:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md), 0 0 40px rgba(45, 212, 191, 0.04);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .turn-header {
@@ -1950,12 +1883,11 @@ async function copyBotText(botMsg) {
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: linear-gradient(135deg, var(--color-accent-deep), var(--color-accent-deep-strong));
-  color: #d6fbf2;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
   font-size: 12px;
   font-weight: 600;
   border-radius: var(--radius-sm);
-  box-shadow: 0 2px 12px rgba(15, 118, 110, 0.28);
 }
 
 .turn-label {
@@ -1996,9 +1928,9 @@ async function copyBotText(botMsg) {
 
 .user-avatar .avatar {
   border: 3px solid transparent;
-  background: linear-gradient(#ffffff, #ffffff) padding-box,
+  background: linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
               linear-gradient(135deg, var(--color-info), var(--color-accent)) border-box;
-  box-shadow: 0 2px 14px var(--color-info-soft);
+  box-shadow: var(--shadow-xs);
 }
 
 .service-avatar .avatar {
@@ -2078,11 +2010,11 @@ async function copyBotText(botMsg) {
 }
 
 .user-bubble {
-  /* 深青渐变：白字对比度由 1.9:1 提升到约 5.5:1（无障碍 AA 达标） */
-  background: linear-gradient(135deg, var(--color-accent-deep), var(--color-accent-deep-strong));
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  color: #ffffff;
-  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.22);
+  /* 京东红实色底：白字对比度约 4.7:1（无障碍 AA 达标） */
+  background: var(--color-accent);
+  border: 1px solid var(--color-accent-strong);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-xs);
   margin-left: auto;
   max-width: 85%;
 }
@@ -2102,14 +2034,14 @@ async function copyBotText(botMsg) {
 
 .turn-bubble p {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--text-sm);
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .user-bubble p {
-  color: #ffffff;
+  color: var(--color-text-inverse);
 }
 
 /* 历史消息分隔线 */
@@ -2152,23 +2084,23 @@ async function copyBotText(botMsg) {
   max-width: 480px;
   width: 100%;
   padding: 44px 40px;
-  background: var(--color-surface-raised);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   text-align: center;
-  box-shadow: var(--shadow-glow-teal), var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  animation: welcomeFloat 0.6s var(--ease-out-back);
+  animation: welcomeFloat var(--duration-slow) var(--ease-out-expo);
 }
 @keyframes welcomeFloat {
-  from { opacity: 0; transform: translateY(36px) scale(0.94); }
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .welcome-glow {
   position: absolute;
   top: -100px; left: 50%; transform: translateX(-50%);
   width: 350px; height: 350px;
-  background: radial-gradient(circle, rgba(45,212,191,0.08) 0%, rgba(45,212,191,0.02) 45%, transparent 70%);
+  background: radial-gradient(circle, var(--color-accent-soft-bg) 0%, transparent 70%);
   pointer-events: none;
 }
 .welcome-avatar-wrapper {
@@ -2180,27 +2112,23 @@ async function copyBotText(botMsg) {
   width: 88px; height: 88px;
   border-radius: 50%;
   padding: 4px;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-deep));
-  box-shadow: 0 0 30px var(--color-accent-glow);
+  background: var(--color-accent);
+  box-shadow: var(--shadow-sm);
 }
 .welcome-status-pulse {
   position: absolute;
   bottom: 6px; right: 6px;
   width: 18px; height: 18px;
   background: var(--color-success);
-  border: 3px solid var(--color-bg-mid);
+  border: 3px solid var(--color-surface);
   border-radius: 50%;
   animation: pulse 2s infinite;
-  box-shadow: 0 0 16px rgba(52, 211, 153, 0.4);
 }
 .welcome-greeting {
   margin: 0 0 8px;
-  font-size: 26px;
+  font-size: var(--text-lg);
   font-weight: 700;
-  background: linear-gradient(135deg, var(--color-text-primary), var(--color-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text-primary);
 }
 .welcome-subtitle {
   margin: 0 0 28px;
@@ -2216,11 +2144,11 @@ async function copyBotText(botMsg) {
 }
 .welcome-chip {
   padding: 10px 20px;
-  border: 1px solid rgba(45, 212, 191, 0.16);
-  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-accent-soft-bg);
   color: var(--color-accent);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-base) var(--ease-out-expo);
@@ -2228,8 +2156,7 @@ async function copyBotText(botMsg) {
 .welcome-chip:hover:not(:disabled) {
   background: var(--color-accent-soft);
   border-color: var(--color-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--color-accent-glow);
+  box-shadow: var(--shadow-xs);
 }
 .welcome-chip:disabled {
   opacity: 0.4;
@@ -2266,16 +2193,16 @@ async function copyBotText(botMsg) {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-success);
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+  box-shadow: var(--shadow-xs);
 }
 .typing-bubble {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 18px;
-  background: var(--color-surface-raised);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 20px 20px 20px 6px;
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 .typing-dots {
@@ -2313,7 +2240,7 @@ async function copyBotText(botMsg) {
   max-width: 320px;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
 }
 
@@ -2374,27 +2301,27 @@ async function copyBotText(botMsg) {
 .status-warning {
   background: var(--color-warm-soft);
   color: var(--color-warm-strong);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  border: 1px solid var(--color-warm);
 }
 .status-info {
   background: var(--color-info-soft);
   color: var(--color-info);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid var(--color-info);
 }
 .status-success {
   background: var(--color-success-soft);
   color: var(--color-success);
-  border: 1px solid rgba(52, 211, 153, 0.25);
+  border: 1px solid var(--color-success);
 }
 .status-muted {
-  background: rgba(113, 111, 104, 0.12);
+  background: var(--color-border-light);
   color: var(--color-text-muted);
-  border: 1px solid rgba(113, 111, 104, 0.18);
+  border: 1px solid var(--color-border);
 }
 .status-danger {
   background: var(--color-danger-soft);
   color: var(--color-danger);
-  border: 1px solid rgba(251, 113, 133, 0.25);
+  border: 1px solid var(--color-danger);
 }
 
 /* ── 商品图片（侧边栏） ────────────────────────────────────── */
@@ -2498,15 +2425,14 @@ async function copyBotText(botMsg) {
 .composer button {
   min-width: 96px;
   padding-inline: 20px;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
-  border-color: transparent;
-  /* 亮青底用深色字：对比度约 9.9:1；白字只有 1.9:1 */
+  background: var(--color-accent);
+  border-color: var(--color-accent-strong);
+  /* 京东红底配白字：对比度约 4.7:1 */
   color: var(--color-text-inverse);
-  box-shadow: 0 10px 24px rgba(20, 184, 166, 0.20);
+  box-shadow: var(--shadow-sm);
 }
 .composer button:hover:not(:disabled) {
-  box-shadow: 0 14px 28px rgba(20, 184, 166, 0.26);
-  transform: translateY(-1px);
+  background: var(--color-accent-strong);
 }
 
 .tabs {
@@ -2521,10 +2447,9 @@ async function copyBotText(botMsg) {
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
-  border-color: transparent;
+  background: var(--color-accent);
+  border-color: var(--color-accent-strong);
   color: var(--color-text-inverse);
-  box-shadow: 0 4px 14px var(--color-accent-glow);
 }
 
 .sidebar-list {
@@ -2635,8 +2560,8 @@ async function copyBotText(botMsg) {
 }
 .suggestion-chip {
   padding: 6px 14px;
-  border: 1px solid rgba(45, 212, 191, 0.14);
-  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-accent-soft-bg);
   color: var(--color-accent);
   font-size: 13px;
@@ -2647,7 +2572,6 @@ async function copyBotText(botMsg) {
 .suggestion-chip:hover:not(:disabled) {
   background: var(--color-accent-soft);
   border-color: var(--color-accent);
-  transform: translateY(-1px);
 }
 .suggestion-chip:disabled {
   opacity: 0.4;
@@ -2666,7 +2590,7 @@ async function copyBotText(botMsg) {
 .messages,
 .sidebar-list {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  scrollbar-color: var(--color-border-strong) transparent;
 }
 .messages::-webkit-scrollbar,
 .sidebar-list::-webkit-scrollbar {
@@ -2678,12 +2602,12 @@ async function copyBotText(botMsg) {
 }
 .messages::-webkit-scrollbar-thumb,
 .sidebar-list::-webkit-scrollbar-thumb {
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md);
+  background: var(--color-border-strong);
 }
 .messages::-webkit-scrollbar-thumb:hover,
 .sidebar-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: var(--color-text-muted);
 }
 
 /* 键盘操作时的焦点可见（此前只有鼠标 hover 态） */
@@ -2722,7 +2646,7 @@ button:focus-visible {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .app-shell {
     padding: 0;
   }
