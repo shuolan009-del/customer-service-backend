@@ -105,6 +105,15 @@ async def _run(goal: str, workspace: str, apply_changes: bool) -> int:
     return 0
 
 
+def _force_utf8_stdout() -> None:
+    """Windows 控制台默认 GBK，打印 emoji/特殊符号会 UnicodeEncodeError 炸在最后一步。"""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001 - 老解释器/被重定向的流忽略即可
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="frontend_optimizer.run",
@@ -117,6 +126,7 @@ def main(argv: list[str] | None = None) -> int:
         "--workspace", default=str(DEFAULT_WORKSPACE.relative_to(PROJECT_ROOT)).replace("\\", "/")
     )
     parser.add_argument("--dry-run", action="store_true", help="只出报告，不把泳道产出写进磁盘")
+    _force_utf8_stdout()
     args = parser.parse_args(argv)
 
     if args.print_config:
