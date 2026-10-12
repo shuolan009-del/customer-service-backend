@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电商智能平台 · 综合演示</title>
+<style>
+/* ============================================================================
+   设计令牌（与 customer-service-frontend 的 design-tokens.css 同源，保证三项目视觉一致）
+   ============================================================================ */
+:root {
+  --primary: #0F766E;
+  --primary-hover: #115E59;
+  --primary-soft: #CCFBF1;
+  --primary-soft-bg: #F0FDFA;
+  --on-primary: #FFFFFF;
+  --success: #15803D;
+  --success-soft: #DCFCE7;
+  --warning: #B45309;
+  --warning-soft: #FEF3C7;
+  --danger: #B42318;
+  --danger-soft: #FEE4E2;
+  --info: #1D4ED8;
+  --info-soft: #DBEAFE;
+
+  --ink-50: #F8FAFC; --ink-100: #F1F5F9; --ink-200: #E2E8F0; --ink-300: #CBD5E1;
+  --ink-400: #94A3B8; --ink-500: #64748B; --ink-600: #475569; --ink-700: #334155;
+  --ink-800: #1E293B; --ink-900: #0F172A;
+
+  --surface: #FFFFFF;
+  --surface-raised: #F8FAFC;
+  --surface-hover: #F1F5F9;
+  --surface-field: #FFFFFF;
+  --border: #E2E8F0;
+  --border-light: #EEF2F6;
+  --border-strong: #CBD5E1;
+
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 10px;
+  --radius-lg: 14px; --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, .12);
+
+  --shell-h: 56px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.4, 0, .2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "Cascadia Code", Consolas, "Courier New", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+ul, ol { list-style: none; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ============================================================================
+   顶栏导航
+   ============================================================================ */
+.shell {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--shell-h);
+  display: flex; align-items: center; gap: var(--space-4, 16px);
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.shell__logo {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  white-space: nowrap;
+}
+.shell__logo-badge {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--primary); color: var(--on-primary);
+}
+.shell__nav { display: flex; gap: 2px; margin-left: 8px; overflow-x: auto; }
+.shell__tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 12px;
+  border: none; border-radius: var(--radius-md);
+  background: transparent; color: var(--text-secondary);
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+  transition: background var(--duration-fast) var(--ease-in-out), color var(--duration-fast);
+}
+.shell__tab:hover { background: var(--surface-hover); color: var(--text-primary); }
+.shell__tab.is-active { background: var(--primary-soft); color: var(--primary); }
+.shell__tab svg { flex-shrink: 0; }
+.shell__right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.shell__pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 26px; padding: 0 10px;
+  border-radius: var(--radius-full);
+  background: var(--success-soft); color: var(--success);
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap; flex-shrink: 0;
+}
+.shell__pill .dot { width: 6px; height: 6px; border-radius: var(--radius-full); background: currentColor; }
+@media (max-width: 900px) { .shell__logo span { display: none; } }
+
+/* ============================================================================
+   视图容器与页头
+   ============================================================================ */
+.view { display: none; padding: 24px; max-width: 1440px; margin: 0 auto; }
+.view.is-active { display: block; animation: viewIn var(--duration-base) var(--ease-out); }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.page-head { margin-bottom: 20px; }
+.page-head h1 { font-size: 20px; font-weight: 700; }
+.page-head p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.card__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border-light);
+}
+.card__title { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; }
+.card__title svg { color: var(--primary); }
+.card__hint { font-size: 12px; color: var(--text-muted); }
+.card__body { padding: 18px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: var(--radius-full);
+  font-size: 12px; font-weight: 600; border: 1px solid transparent;
+}
+.badge--success { background: var(--success-soft); color: var(--success); }
+.badge--warning { background: var(--warning-soft); color: var(--warning); }
+.badge--danger { background: var(--danger-soft); color: var(--danger); }
+.badge--info { background: var(--info-soft); color: var(--info); }
+.badge--muted { background: var(--surface-hover); color: var(--text-muted); border-color: var(--border); }
+.badge--primary { background: var(--primary-soft); color: var(--primary); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 0 16px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text-primary);
+  font-size: 13px; font-weight: 600;
+  transition: all var(--duration-fast) var(--ease-in-out);
+}
+.btn:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--ink-400); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn--primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn--primary:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn--sm { min-height: 30px; padding: 0 12px; font-size: 12px; }
+.btn--success { background: var(--success); border-color: var(--success); color: #fff; }
+.btn--danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn--block { width: 100%; }
+
+.grid { display: grid; gap: 16px; }
+.grid--kpi { grid-template-columns: repeat(4, 1fr); }
+.grid--2 { grid-template-columns: repeat(2, 1fr); }
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1100px) { .grid--kpi, .grid--3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px) { .grid--kpi, .grid--3, .grid--2 { grid-template-columns: 1fr; } }
+
+/* ============================================================================
+   总览视图
+   ============================================================================ */
+.kpi { padding: 16px 18px; }
+.kpi__label { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.kpi__value { font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.kpi__trend { font-size: 12px; font-weight: 600; margin-top: 2px; }
+.kpi__trend--up { color: var(--success); }
+.kpi__trend--flat { color: var(--text-muted); }
+
+.sys-card { display: flex; flex-direction: column; }
+.sys-card__body { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.sys-card__desc { font-size: 13px; color: var(--text-secondary); flex: 1; }
+.sys-card__meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.sys-card__stats { display: flex; gap: 16px; padding-top: 10px; border-top: 1px dashed var(--border); }
+.sys-card__stat b { display: block; font-size: 16px; font-variant-numeric: tabular-nums; }
+.sys-card__stat span { font-size: 11px; color: var(--text-muted); }
+
+.feed { display: flex; flex-direction: column; }
+.feed__item { display: flex; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border-light); }
+.feed__item:last-child { border-bottom: none; }
+.feed__icon {
+  flex-shrink: 0; display: grid; place-items: center;
+  width: 30px; height: 30px; border-radius: var(--radius-full);
+}
+.feed__icon--cs { background: var(--primary-soft); color: var(--primary); }
+.feed__icon--op { background: var(--info-soft); color: var(--info); }
+.feed__icon--kb { background: var(--warning-soft); color: var(--warning); }
+.feed__text { font-size: 13px; flex: 1; min-width: 0; }
+.feed__time { font-size: 11px; color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.demo-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-top: 16px; padding: 10px 14px;
+  border: 1px dashed var(--border-strong); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text-muted); font-size: 12px;
+}
+
+/* ============================================================================
+   智能客服视图（三栏）
+   ============================================================================ */
+.cs-grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 340px;
+  gap: 16px;
+  height: calc(100vh - var(--shell-h) - 48px);
+  min-height: 560px;
+}
+@media (max-width: 1179px) { .cs-grid { grid-template-columns: 1fr; height: auto; } }
+
+.avatar-panel { display: flex; flex-direction: column; gap: 14px; padding: 18px; }
+.avatar-panel__stage {
+  position: relative; width: 100%; aspect-ratio: 9 / 16; max-height: 380px;
+  border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--primary-soft-bg), transparent 62%),
+    linear-gradient(180deg, var(--surface-raised) 0%, var(--surface) 100%);
+  display: grid; place-items: center;
+}
+.avatar-panel__figure { display: grid; place-items: center; gap: 10px; color: var(--text-muted); font-size: 13px; text-align: center; padding: 16px; }
+.avatar-panel__ring {
+  width: 84px; height: 84px; border-radius: var(--radius-full);
+  border: 2px dashed var(--border-strong);
+  display: grid; place-items: center;
+  color: var(--primary); background: var(--surface);
+}
+.avatar-panel__ring.is-live { border-style: solid; border-color: var(--success); color: var(--success); animation: pulse 2s var(--ease-in-out) infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--success-soft); } 50% { box-shadow: 0 0 0 8px var(--success-soft); } }
+.avatar-panel__status { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+.avatar-panel__ws { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+.avatar-panel__ws .dot { width: 7px; height: 7px; border-radius: var(--radius-full); background: var(--ink-400); }
+.avatar-panel__ws .dot.is-open { background: var(--success); }
+
+.chat-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.chat-card__head { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border-light); }
+.chat-card__avatar { width: 38px; height: 38px; border-radius: var(--radius-full); background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; font-weight: 700; }
+.chat-card__who h2 { font-size: 14px; }
+.chat-card__who p { font-size: 11px; color: var(--text-muted); }
+.chat-card__who .online { color: var(--success); font-weight: 600; }
+
+.stream { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; background: var(--surface-raised); }
+.stream__day { align-self: center; padding: 2px 12px; border: 1px solid var(--border); border-radius: var(--radius-full); background: var(--surface-hover); font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.msg { display: flex; gap: 10px; max-width: 82%; }
+.msg--out { align-self: flex-end; flex-direction: row-reverse; }
+.msg__avatar { flex-shrink: 0; width: 30px; height: 30px; border-radius: var(--radius-full); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.msg--in .msg__avatar { background: var(--primary-soft); color: var(--primary); }
+.msg--out .msg__avatar { background: var(--info-soft); color: var(--info); }
+.msg__bubble {
+  padding: 9px 13px; border-radius: var(--radius-lg);
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 13px; box-shadow: var(--shadow-sm);
+  word-break: break-word;
+}
+.msg--in .msg__bubble { border-top-left-radius: var(--radius-xs); }
+.msg--out .msg__bubble { background: var(--primary-soft); border-color: var(--primary-soft); border-top-right-radius: var(--radius-xs); }
+.msg__meta { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.msg--out .msg__meta { text-align: right; }
+.msg__track { display: inline-flex; margin-right: 6px; padding: 0 6px; border-radius: var(--radius-xs); font-size: 10px; font-weight: 700; vertical-align: 1px; }
+.msg__track--task { background: var(--info-soft); color: var(--info); }
+.msg__track--kb { background: var(--warning-soft); color: var(--warning); }
+.msg__track--chat { background: var(--surface-hover); color: var(--text-muted); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: var(--radius-full);
+  background: var(--surface); font-size: 12px; font-weight: 600; color: var(--text-primary);
+  transition: all var(--duration-fast) var(--ease-in-out);
+}
+.chip:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-soft-bg); }
+.chip:disabled { opacity: .5; cursor: not-allowed; }
+
+.composer { display: flex; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--border-light); background: var(--surface); }
+.composer input {
+  flex: 1; min-width: 0; height: 38px; padding: 0 14px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+  font-size: 13px; background: var(--surface-field);
+}
+.composer input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.composer .btn { flex-shrink: 0; }
+
+.sidebar { display: flex; flex-direction: column; overflow: hidden; }
+.sidebar__tabs { display: flex; gap: 6px; padding: 12px 14px 0; }
+.sidebar__tab { flex: 1; height: 30px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.sidebar__tab.is-active { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.sidebar__list { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.obj-card { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface-raised); display: flex; flex-direction: column; gap: 8px; }
+.obj-card__title { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.obj-card__row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+.obj-card__row b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.sidebar__empty { text-align: center; color: var(--text-muted); font-size: 12px; padding: 32px 0; }
+
+/* ============================================================================
+   商品运营视图
+   ============================================================================ */
+.op-grid { display: grid; grid-template-columns: 260px minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 1179px) { .op-grid { grid-template-columns: 1fr; } }
+
+.prod-item { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--surface-raised); }
+.prod-item:hover { border-color: var(--border-strong); }
+.prod-item.is-active { border-color: var(--primary); background: var(--primary-soft-bg); }
+.prod-item__name { font-size: 13px; font-weight: 700; }
+.prod-item__meta { font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+
+.flow { display: flex; flex-direction: column; gap: 0; padding: 20px 18px; }
+.flow__node {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); position: relative;
+  transition: all var(--duration-base) var(--ease-out);
+}
+.flow__node + .flow__node { margin-top: 26px; }
+.flow__node + .flow__node::before {
+  content: ""; position: absolute; left: 27px; top: -27px; width: 2px; height: 26px;
+  background: var(--border);
+}
+.flow__node.is-done + .flow__node::before, .flow__node.is-running + .flow__node::before { background: var(--primary); }
+.flow__icon {
+  flex-shrink: 0; width: 32px; height: 32px; border-radius: var(--radius-full);
+  display: grid; place-items: center;
+  background: var(--surface-hover); color: var(--text-muted);
+  font-size: 12px; font-weight: 700;
+  transition: all var(--duration-base) var(--ease-out);
+}
+.flow__node.is-running .flow__icon { background: var(--primary); color: var(--on-primary); animation: spin 1s linear infinite; }
+.flow__node.is-done .flow__icon { background: var(--success); color: #fff; }
+.flow__node.is-gate . border-color: var(--warning); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.flow__info { flex: 1; min-width: 0; }
+.flow__name { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.flow__desc { font-size: 11px; color: var(--text-muted); }
+.flow__state { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.flow__node.is-running .flow__state { color: var(--primary); }
+.flow__node.is-done .flow__state { color: var(--success); }
+.flow__node.is-running { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+.op-log {
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.8;
+  background: var(--ink-900); color: var(--ink-300);
+  border-radius: var(--radius-md); padding: 12px 14px;
+  max-height: 220px; overflow-y: auto;
+}
+.op-log__line { white-space: pre-wrap; word-break: break-all; }
+.op-log__line b { color: #5EEAD4; font-weight: 400; }
+.op-log__line i { color: #FCD34D; font-style: normal; }
+
+.op-report { display: flex; flex-direction: column; gap: 12px; }
+.op-report__section { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px 14px; }
+.op-report__section h4 { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.op-report__section p, .op-report__section li { font-size: 12px; color: var(--text-secondary); }
+.op-report__section ul { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.op-report__section li { padding-left: 14px; position: relative; }
+.op-report__section li::before { content: "·"; position: absolute; left: 4px; color: var(--primary); font-weight: 700; }
+.op-gate { border: 1px solid var(--warning); background: var(--warning-soft); border-radius: var(--radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.op-gate__text { font-size: 12px; color: var(--warning); font-weight: 600; }
+.op-gate__actions { display: flex; gap: 8px; }
+
+/* ============================================================================
+   智能智库视图
+   ============================================================================ */
+.kb-grid { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 960px) { .kb-grid { grid-template-columns: 1fr; } }
+
+.doc-item { width: 100%; text-align: left; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--surface-raised); }
+.doc-item:hover { border-color: var(--border-strong); }
+.doc-item__icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: var(--radius-sm); display: grid; place-items: center; font-size: 10px; font-weight: 700; }
+.doc-item__icon--pdf { background: var(--danger-soft); color: var(--danger); }
+.doc-item__icon--md { background: var(--info-soft); color: var(--info); }
+.doc-item__name { font-size: 12px; font-weight: 600; }
+.doc-item__meta { font-size: 10px; color: var(--text-muted); }
+
+.pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid var(--border-light); }
+.pipe-node {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--radius-full);
+  background: var(--surface); font-size: 11px; font-weight: 600; color: var(--text-muted);
+  transition: all var(--duration-base) var(--ease-out);
+}
+.pipe-node.is-active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft-bg); }
+.pipe-node.is-done { border-color: var(--success); color: var(--success); background: var(--success-soft); }
+.pipe-arrow { color: var(--ink-300); font-size: 11px; }
+
+.kb-answer { font-size: 13px; color: var(--text-primary); white-space: pre-wrap; }
+.kb-caret { display: inline-block; width: 8px; height: 15px; background: var(--primary); vertical-align: -2px; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.kb-chunks { display: flex; flex-direction: column; gap: 8px; }
+.kb-chunk { border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface-raised); }
+.kb-chunk__head { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.kb-chunk__score { font-family: var(--font-mono); color: var(--primary); font-weight: 700; }
+.kb-chunk__text { font-size: 11px; color: var(--text-secondary); }
+
+/* ============================================================================
+   架构视图
+   ============================================================================ */
+.arch-wrap { overflow-x: auto; }
+.arch-wrap svg { display: block; min-width: 860px; width: 100%; height: auto; }
+.arch-legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); }
+.arch-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.arch-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+footer.site { padding: 20px 24px 32px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- 内联 SVG 图标库 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 4h8"/><circle cx="9" cy="14" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  </defs>
+</svg>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     顶栏
+     ══════════════════════════════════════════════════════════════════════ -->
+<header class="shell">
+  <div class="shell__logo">
+    <span class="shell__logo-badge"><svg width="16" height="16" aria-hidden="true"><use href="#i-layers"/></svg></span>
+    <span>电商智能平台</span>
+  </div>
+  <nav class="shell__nav" role="tablist" aria-label="平台模块">
+    <button class="shell__tab is-active" role="tab" aria-selected="true" data-view="overview">
+      <svg width="14" height="14" aria-hidden="true"><use href="#i-grid"/></svg>平台总览
+    </button>
+    <button class="shell__tab" role="tab" aria-selected="false" data-view="service">
+      <svg width="14" height="14" aria-hidden="true"><use href="#i-chat"/></svg>智能客服
+    </button>
+    <button class="shell__tab" role="tab" aria-selected="false" data-view="operation">
+      <svg width="14" height="14" aria-hidden="true"><use href="#i-rocket"/></svg>商品运营
+    </button>
+    <button class="shell__tab" role="tab" aria-selected="false" data-view="knowledge">
+      <svg width="14" height="14" aria-hidden="true"><use href="#i-book"/></svg>智能智库
+    </button>
+    <button class="shell__tab" role="tab" aria-selected="false" data-view="architecture">
+      <svg width="14" height="14" aria-hidden="true"><use href="#i-activity"/></svg>系统架构
+    </button>
+  </nav>
+  <div class="shell__right">
+    <span class="shell__pill"><span class="dot"></span>演示模式</span>
+  </div>
+</header>
+
+<main>
+<!-- ══════════════════════════════════════════════════════════════════════
+     视图一：平台总览
+     ══════════════════════════════════════════════════════════════════════ -->
+<section class="view is-active" id="view-overview" role="tabpanel" aria-label="平台总览">
+  <div class="page-head">
+    <h1>平台总览</h1>
+    <p>三大子系统统一视图：商品运营（售前）· 智能智库（售中）· 智能客服（售后）</p>
+  </div>
+
+  <div class="grid grid--kpi">
+    <div class="card kpi">
+      <div class="kpi__label"><svg width="13" height="13" aria-hidden="true"><use href="#i-chat"/></svg>今日客服会话</div>
+      <div class="kpi__value">1,247</div>
+      <div class="kpi__trend kpi__trend--up">▲ 12.4% 较昨日</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi__label"><svg width="13" height="13" aria-hidden="true"><use href="#i-rocket"/></svg>待审批运营策略</div>
+      <div class="kpi__value">3</div>
+      <div class="kpi__trend kpi__trend--flat">2 条今日新生成</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi__label"><svg width="13" height="13" aria-hidden="true"><use href="#i-book"/></svg>知识库文档</div>
+      <div class="kpi__value">86</div>
+      <div class="kpi__trend kpi__trend--up">▲ 4 份本周新增</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi__label"><svg width="13" height="13" aria-hidden="true"><use href="#i-bot"/></svg>AI 一次解决率</div>
+      <div class="kpi__value">87.3%</div>
+      <div class="kpi__trend kpi__trend--up">▲ 2.1pt 较上周</div>
+    </div>
+  </div>
+
+  <div class="grid grid--3" style="margin-top:16px">
+    <div class="card sys-card">
+      <div class="card__head">
+        <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-chat"/></svg>智能客服</span>
+        <span class="badge badge--success">运行中</span>
+      </div>
+      <div class="sys-card__body">
+        <p class="sys-card__desc">电商小二对话引擎：任务 / 知识 / 闲聊三轨分流，魔珐数字人语音播报，业务对象直达下单链路。</p>
+        <div class="sys-card__meta">
+          <span class="badge badge--muted">FastAPI</span>
+          <span class="badge badge--muted">Vue 3</span>
+          <span class="badge badge--muted">MySQL</span>
+          <span class="badge badge--muted">WebSocket</span>
+        </div>
+        <div class="sys-card__stats">
+          <div class="sys-card__stat"><b>1,247</b><span>今日会话</span></div>
+          <div class="sys-card__stat"><b>3.7s</b><span>平均响应</span></div>
+          <div class="sys-card__stat"><b>98.2%</b><span>通道可用</span></div>
+        </div>
+        <button class="btn btn--primary btn--block btn--sm" data-goto="service">进入工作台</button>
+      </div>
+    </div>
+
+    <div class="card sys-card">
+      <div class="card__head">
+        <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-rocket"/></svg>商品运营助手</span>
+        <span class="badge badge--success">运行中</span>
+      </div>
+      <div class="sys-card__body">
+        <p class="sys-card__desc">多 Agent 运营工作流：商品诊断 → 创意策略 → 质量审查 → 人工审批，版本化工具白名单与质检策略。</p>
+        <div class="sys-card__meta">
+          <span class="badge badge--muted">FastAPI</span>
+          <span class="badge badge--muted">LangGraph</span>
+          <span class="badge badge--muted">Next.js</span>
+          <span class="badge badge--muted">Alembic</span>
+        </div>
+        <div class="sys-card__stats">
+          <div class="sys-card__stat"><b>3</b><span>待审批</span></div>
+          <div class="sys-card__stat"><b>46</b><span>本周运行</span></div>
+          <div class="sys-card__stat"><b>4</b><span>专家 Agent</span></div>
+        </div>
+        <button class="btn btn--primary btn--block btn--sm" data-goto="operation">进入运营台</button>
+      </div>
+    </div>
+
+    <div class="card sys-card">
+      <div class="card__head">
+        <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-book"/></svg>智能智库</span>
+        <span class="badge badge--warning">GPU 离线</span>
+      </div>
+      <div class="sys-card__body">
+        <p class="sys-card__desc">产品手册 RAG：MinerU 解析 → BGE-M3 向量化 → Milvus 检索，HyDE + 网页搜索三路召回，RRF 融合 + 重排。</p>
+        <div class="sys-card__meta">
+          <span class="badge badge--muted">LangGraph</span>
+          <span class="badge badge--muted">Milvus</span>
+          <span class="badge badge--muted">MongoDB</span>
+          <span class="badge badge--muted">MinIO</span>
+        </div>
+        <div class="sys-card__stats">
+          <div class="sys-card__stat"><b>86</b><span>已索引文档</span></div>
+          <div class="sys-card__stat"><b>12,408</b><span>向量块</span></div>
+          <div class="sys-card__stat"><b>0.91</b><span>检索相关度</span></div>
+        </div>
+        <button class="btn btn--primary btn--block btn--sm" data-goto="knowledge">进入智库</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card__head">
+      <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-activity"/></svg>平台动态</span>
+      <span class="card__hint">跨系统事件流（演示数据）</span>
+    </div>
+    <div class="feed" id="overview-feed"></div>
+  </div>
+
+  <div class="demo-note">
+    <svg width="14" height="14" aria-hidden="true" style="flex-shrink:0;margin-top:2px"><use href="#i-file"/></svg>
+    <span>本页面为<b>综合演示 Demo</b>：三套后端（客服 :18082 / 电商 :18081 / 智库 :8000+:8001 / 运营助手）未连接，所有数据均为内置演示数据，交互为前端模拟。服务拓扑见「系统架构」页。</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     视图二：智能客服
+     ══════════════════════════════════════════════════════════════════════ -->
+<section class="view" id="view-service" role="tabpanel" aria-label="智能客服">
+  <div class="page-head">
+    <h1>智能客服工作台</h1>
+    <p>三轨对话引擎（任务 / 知识 / 闲聊）+ 数字人播报 + 业务对象 · 模拟 customer-service-backend 的 DialogueEngine</p>
+  </div>
+
+  <div class="cs-grid">
+    <!-- 左：数字人面板 -->
+    <aside class="card avatar-panel">
+      <div class="avatar-panel__stage">
+        <div class="avatar-panel__figure">
+          <div class="avatar-panel__ring" id="cs-avatar-ring">
+            <svg width="30" height="30" aria-hidden="true"><use href="#i-bot"/></svg>
+          </div>
+          <span id="cs-avatar-text">数字人未连接<br>点击下方按钮模拟连接</span>
+        </div>
+      </div>
+      <div class="avatar-panel__status">
+        <span>小宝 · 金牌客服</span>
+        <span class="badge badge--muted" id="cs-avatar-badge">未连接</span>
+      </div>
+      <div class="avatar-panel__ws">
+        <span class="dot" id="cs-ws-dot"></span>
+        <span id="cs-ws-text">WS 通道未连接</span>
+      </div>
+      <button class="btn btn--primary btn--block" id="cs-connect-btn">
+        <svg width="14" height="14" aria-hidden="true"><use href="#i-plug"/></svg>连接数字人
+      </button>
+      <p style="font-size:11px;color:var(--text-muted);text-align:center">连接后，客服回复将由数字人朗读（演示为状态模拟）</p>
+    </aside>
+
+    <!-- 中：对话流 -->
+    <div class="card chat-card">
+      <div class="chat-card__head">
+        <div class="chat-card__avatar">宝</div>
+        <div class="chat-card__who">
+          <h2>电商客服系统</h2>
+          <p><span class="online">● 在线</span> · 小宝 · 金牌客服 · <span id="cs-sender-label">u1001</span></p>
+        </div>
+        <button class="btn btn--sm" id="cs-reset-btn" style="margin-left:auto">
+          <svg width="13" height="13" aria-hidden="true"><use href="#i-refresh"/></svg>新对话
+        </button>
+      </div>
+      <div class="stream" id="cs-stream" role="log" aria-live="polite" aria-label="对话消息">
+        <span class="stream__day">今天</span>
+      </div>
+      <div class="chips" style="padding:10px 18px 0" id="cs-chips"></div>
+      <form class="composer" id="cs-form">
+        <label class="sr-only" for="cs-input">咨询内容</label>
+        <input id="cs-input" type="text" placeholder="请输入咨询内容…" autocomplete="off">
+        <button class="btn btn--primary" type="submit" aria-label="发送消息">
+          <svg width="14" height="14" aria-hidden="true"><use href="#i-send"/></svg>发送
+        </button>
+      </form>
+    </div>
+
+    <!-- 右：业务对象 -->
+    <aside class="card sidebar">
+      <div class="card__head" style="border-bottom:none;padding-bottom:0">
+        <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-layers"/></svg>业务对象</span>
+        <span class="card__hint" id="cs-obj-count"></span>
+      </div>
+      <div class="sidebar__tabs">
+        <button class="sidebar__tab is-active" data-objtab="orders">订单</button>
+        <button class="sidebar__tab" data-objtab="products">商品</button>
+      </div>
+      <div class="sidebar__list" id="cs-obj-list"></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     视图三：商品运营
+     ══════════════════════════════════════════════════════════════════════ -->
+<section class="view" id="view-operation" role="tabpanel" aria-label="商品运营">
+  <div class="page-head">
+    <h1>商品运营工作台</h1>
+    <p>多 Agent 运营管线 · 模拟 ecommerce-operation-assistant 的 LangGraph 工作流（product_operation v1.0.0）</p>
+  </div>
+
+  <div class="op-grid">
+    <!-- 左：商品选择 -->
+    <div class="card">
+      <div class="card__head"><span class="card__title">选择商品</span><span class="card__hint">演示数据</span></div>
+      <div class="card__body" style="display:flex;flex-direction:column;gap:8px" id="op-product-list"></div>
+    </div>
+
+    <!-- 中：工作流 -->
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card">
+        <div class="card__head">
+          <span class="card__title"><svg width="15" height="15" aria-hidden="true"><use href="#i-rocket"/></svg>运营管线</span>
+          <button class="btn btn--primary btn--sm" id="op-run-btn">
+            <svg width="13" height="13" aria-hidden="true"><use href="#i-activity"/></svg>开始诊断
+          </button>
+        </div>
+        <div class="flow" id="op-flow"></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><span class="card__title">运行日志</span><span class="card__hint">agent_runs 事件流（模拟）</span></div>
+        <div class="card__body"><div class="op-log" id="op-log"><div class="op-log__line">等待启动…选择左侧商品后点击「开始诊断」。</div></div></div>
+      </div>
+    </div>
+
+    <!-- 右：产出与审批 -->
+    <div class="card">
+      <div class="card__head"><span class="card__title">运行产出</span><span class="badge badge--muted" id="op-status-badge">未运行</span></div>
+      <div class="card__body op-report" id="op-report">
+        <p style="font-size:12px;color:var(--text-muted)">尚无产出。运行工作流后，这里会依次展示诊断报告、创意策略与质检报告，最后进入人工审批门禁。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     视图四：智能智库
+     ══════════════════════════════════════════════════════════════════════ -->
+<section class="view" id="view-knowledge" role="tabpanel" aria-label="智能智库">
+  <div class="page-head">
+    <h1>智能智库</h1>
+    <p>产品手册 RAG 问答 · 模拟 knowledge_base 的查询管线：商品名确认 → 三路检索 → RRF 融合 → 重排 → 生成</p>
+  </div>
+
+  <div class="kb-grid">
+    <!-- 左：文档库 -->
+    <div class="card">
+      <div class="card__head"><span class="card__title">文档库</span><span class="card__hint">86 份已索引</span></div>
+      <div class="card__body" style="display:flex;flex-direction:column;gap:8px" id="kb-doc-list"></div>
+    </div>
+
+    <!-- 右：管线 + 问答 -->
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card">
+        <div class="pipeline" id="kb-pipeline">
+          <span class="pipe-node" data-pipe="confirm">商品名确认</span><span class="pipe-arrow">→</span>
+          <span class="pipe-node" data-pipe="search">三路检索</span><span class="pipe-arrow">→</span>
+          <span class="pipe-node" data-pipe="rrf">RRF 融合</span><span class="pipe-arrow">→</span>
+          <span class="pipe-node" data-pipe="rerank">BGE 重排</span><span class="pipe-arrow">→</span>
+          <span class="pipe-node" data-pipe="gen">LLM 生成</span>
+        </div>
+        <form class="composer" id="kb-form" style="border-top:none">
+          <label class="sr-only" for="kb-input">知识库问题</label>
+          <input id="kb-input" type="text" placeholder="例如：iPhone 15 Pro 的电池容量是多少？" autocomplete="off">
+          <button class="btn btn--primary" type="submit" aria-label="提问">
+            <svg width="14" height="14" aria-hidden="true"><use href="#i-search"/></svg>提问
+          </button>
+        </form>
+      </div>
+
+      <div class="grid grid--2">
+        <div class="card">
+          <div class="card__head"><span class="card__title">回答</span><span class="card__hint" id="kb-answer-hint">流式生成（模拟）</span></div>
+          <div class="card__body"><div class="kb-answer" id="kb-answer">请输入问题，或点击下方预设问题。</div></div>
+        </div>
+        <div class="card">
+          <div class="card__head"><span class="card__title">检索召回</span><span class="card__hint">rerank 后的 chunk</span></div>
+          <div class="card__body kb-chunks" id="kb-chunks">
+            <p style="font-size:12px;color:var(--text-muted)">发起提问后，这里展示召回的文档片段与相关度分数。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips" id="kb-chips"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     视图五：系统架构
+     ══════════════════════════════════════════════════════════════════════ -->
+<section class="view" id="view-architecture" role="tabpanel" aria-label="系统架构">
+  <div class="page-head">
+    <h1>系统架构</h1>
+    <p>三大项目在本机的真实拓扑：服务、端口与数据流（2026-10-12 盘点）</p>
+  </div>
+
+  <div class="card arch-wrap">
+    <svg viewBox="0 0 960 560" role="img" aria-label="三项目系统架构拓扑图">
+      <style>
+        .ab-box { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1; rx: 10; }
+        .ab-title { font: 700 13px var(--font); fill: #0F172A; }
+        .ab-sub { font: 400 11px var(--font); fill: #64748B; }
+        .ab-tag { font: 600 10px var(--font); }
+        .ab-flow { stroke: #94A3B8; stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+        .ab-flow-dash { stroke-dasharray: 5 4; }
+      </style>
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#94A3B8"/>
+        </marker>
+      </defs>
+
+      <!-- 用户层 -->
+      <rect x="360" y="16" width="240" height="52" rx="10" fill="#0F766E"/>
+      <text x="480" y="38" text-anchor="middle" style="font:700 14px var(--font);fill:#fff">运营 / 客服 / 消费者</text>
+      <text x="480" y="56" text-anchor="middle" style="font:400 10px var(--font);fill:#CCFBF1">统一入口：本综合平台 Demo</text>
+
+      <!-- 三个系统框 -->
+      <rect x="24" y="104" width="280" height="180" rx="10" fill="#F0FDFA" stroke="#0F766E"/>
+      <text x="40" y="128" class="ab-title" style="fill:#0F766E">customer-service-backend</text>
+      <text x="40" y="145" class="ab-sub">智能客服（FastAPI :18082 + Vue :5173）</text>
+      <rect x="40" y="156" width="112" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="96" y="173" text-anchor="middle" class="ab-tag" fill="#0F766E">DialogueEngine</text>
+      <rect x="160" y="156" width="128" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="224" y="173" text-anchor="middle" class="ab-tag" fill="#0F766E">数字人 WS 通道</text>
+      <rect x="40" y="188" width="112" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="96" y="205" text-anchor="middle" class="ab-tag" fill="#64748B">任务/知识/闲聊</text>
+      <rect x="160" y="188" width="128" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="224" y="205" text-anchor="middle" class="ab-tag" fill="#64748B">MySQL commerce</text>
+      <text x="40" y="240" class="ab-sub">三轨分流 · TurnPlanner · 防幻觉校验</text>
+      <text x="40" y="258" class="ab-sub">POST /api/chat · GET /api/chat/history</text>
+
+      <rect x="340" y="104" width="280" height="180" rx="10" fill="#EFF6FF" stroke="#1D4ED8"/>
+      <text x="356" y="128" class="ab-title" style="fill:#1D4ED8">ecommerce-operation-assistant</text>
+      <text x="356" y="145" class="ab-sub">商品运营（FastAPI + Next.js）</text>
+      <rect x="356" y="156" width="118" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="415" y="173" text-anchor="middle" class="ab-tag" fill="#1D4ED8">诊断 Agent</text>
+      <rect x="482" y="156" width="122" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="543" y="173" text-anchor="middle" class="ab-tag" fill="#1D4ED8">创意策略 Agent</text>
+      <rect x="356" y="188" width="118" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="415" y="205" text-anchor="middle" class="ab-tag" fill="#1D4ED8">质检 Agent</text>
+      <rect x="482" y="188" width="122" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="543" y="205" text-anchor="middle" class="ab-tag" fill="#B45309">人工审批门禁</text>
+      <text x="356" y="240" class="ab-sub">LangGraph 状态机 · 工具白名单</text>
+      <text x="356" y="258" class="ab-sub">agent_runs 事件持久化 · Alembic</text>
+
+      <rect x="656" y="104" width="280" height="180" rx="10" fill="#FFFBEB" stroke="#B45309"/>
+      <text x="672" y="128" class="ab-title" style="fill:#B45309">knowledge_base</text>
+      <text x="672" y="145" class="ab-sub">智能智库（FastAPI :8000 / :8001）</text>
+      <rect x="672" y="156" width="118" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="731" y="173" text-anchor="middle" class="ab-tag" fill="#B45309">导入管线</text>
+      <rect x="798" y="156" width="122" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="859" y="173" text-anchor="middle" class="ab-tag" fill="#B45309">查询管线</text>
+      <rect x="672" y="188" width="118" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="731" y="205" text-anchor="middle" class="ab-tag" fill="#64748B">Milvus 向量</text>
+      <rect x="798" y="188" width="122" height="26" rx="6" fill="#fff" stroke="#CBD5E1"/><text x="859" y="205" text-anchor="middle" class="ab-tag" fill="#64748B">Mongo/MinIO</text>
+      <text x="672" y="240" class="ab-sub">BGE-M3 嵌入 · BGE 重排 · MinerU</text>
+      <text x="672" y="258" class="ab-sub">三路检索 → RRF → rerank → 生成</text>
+
+      <!-- 数据流连线 -->
+      <path class="ab-flow" d="M 430 68 C 430 88, 164 88, 164 100"/>
+      <path class="ab-flow" d="M 480 68 L 480 100"/>
+      <path class="ab-flow" d="M 530 68 C 530 88, 796 88, 796 100"/>
+
+      <path class="ab-flow ab-flow-dash" d="M 320 200 L 336 200"/>
+      <path class="ab-flow ab-flow-dash" d="M 624 200 L 652 200"/>
+
+      <!-- 基础设施层 -->
+      <rect x="24" y="320" width="912" height="120" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="40" y="344" class="ab-title" style="font-size:12px">共享基础设施（本机 Windows）</text>
+      <rect x="40" y="358" width="130" height="56" rx="8" fill="#fff" stroke="#CBD5E1"/><text x="105" y="382" text-anchor="middle" class="ab-tag" fill="#0F172A">MySQL 3306</text><text x="105" y="400" text-anchor="middle" class="ab-sub">customer_service</text>
+      <rect x="186" y="358" width="130" height="56" rx="8" fill="#fff" stroke="#CBD5E1"/><text x="251" y="382" text-anchor="middle" class="ab-tag" fill="#0F172A">MySQL 3306</text><text x="251" y="400" text-anchor="middle" class="ab-sub">commerce（演示订单）</text>
+      <rect x="332" y="358" width="130" height="56" rx="8" fill="#fff" stroke="#CBD5E1" stroke-dasharray="4 3"/><text x="397" y="382" text-anchor="middle" class="ab-tag" fill="#64748B">Milvus</text><text x="397" y="400" text-anchor="middle" class="ab-sub">向量检索（Docker）</text>
+      <rect x="478" y="358" width="130" height="56" rx="8" fill="#fff" stroke="#CBD5E1" stroke-dasharray="4 3"/><text x="543" y="382" text-anchor="middle" class="ab-tag" fill="#64748B">MongoDB</text><text x="543" y="400" text-anchor="middle" class="ab-sub">会话历史</text>
+      <rect x="624" y="358" width="130" height="56" rx="8" fill="#fff" stroke="#CBD5E1" stroke-dasharray="4 3"/><text x="689" y="382" text-anchor="middle" class="ab-tag" fill="#64748B">MinIO</text><text x="689" y="400" text-anchor="middle" class="ab-sub">对象存储</text>
+      <rect x="770" y="358" width="140" height="56" rx="8" fill="#fff" stroke="#CBD5E1"/><text x="840" y="382" text-anchor="middle" class="ab-tag" fill="#0F172A">SiliconFlow LLM</text><text x="840" y="400" text-anchor="middle" class="ab-sub">Qwen 兼容端点</text>
+
+      <path class="ab-flow" d="M 164 288 L 164 316"/>
+      <path class="ab-flow" d="M 480 288 L 480 316"/>
+      <path class="ab-flow" d="M 796 288 L 796 316"/>
+      <path class="ab-flow" d="M 690 414 C 690 470, 480 470, 480 452"/>
+      <path class="ab-flow" d="M 840 414 L 840 300 L 360 300"/>
+
+      <!-- 图例 -->
+      <rect x="24" y="468" width="912" height="64" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="40" y="492" class="ab-tag" fill="#0F172A" style="font-size:11px">图例</text>
+      <circle cx="46" cy="510" r="5" fill="#0F766E"/><text x="58" y="514" class="ab-sub">客服链路（本机已跑通）</text>
+      <circle cx="200" cy="510" r="5" fill="#1D4ED8"/><text x="212" y="514" class="ab-sub">运营链路（本机已跑通）</text>
+      <circle cx="368" cy="510" r="5" fill="#B45309"/><text x="380" y="514" class="ab-sub">智库链路（需 GPU/Docker，当前离线）</text>
+      <line x1="540" y1="510" x2="566" y2="510" class="ab-flow"/><text x="572" y="514" class="ab-sub">请求流</text>
+      <line x1="636" y1="510" x2="662" y2="510" class="ab-flow ab-flow-dash"/><text x="668" y="514" class="ab-sub">间接依赖</text>
+      <text x="40" y="544" class="ab-sub">虚线框 = 演示环境下未启动的服务；实线框 = 本机 MySQL 服务（mysqld，3306）与 SiliconFlow LLM。</text>
+    </svg>
+  </div>
+
+  <div class="grid grid--3" style="margin-top:16px">
+    <div class="card"><div class="card__body" style="padding:14px 18px">
+      <div class="sys-card__stat" style="border:none;padding:0"><b>客服闭环</b><span style="margin-top:4px;display:block">用户咨询 → 三轨引擎 →（知识轨）调智库检索 → 生成回复 → 数字人播报。演示中知识轨以内置答案模拟。</span></div>
+    </div></div>
+    <div class="card"><div class="card__body" style="padding:14px 18px">
+      <div class="sys-card__stat" style="border:none;padding:0"><b>运营闭环</b><span style="margin-top:4px;display:block">选品 → 4 个专家 Agent 串行产出 → 质检合规 → 人工审批 → 落库为可执行策略。</span></div>
+    </div></div>
+    <div class="card"><div class="card__body" style="padding:14px 18px">
+      <div class="sys-card__stat" style="border:none;padding:0"><b>知识闭环</b><span style="margin-top:4px;display:block">手册 PDF → MinerU 解析 → BGE-M3 向量化 → Milvus；查询时三路召回 + RRF + 重排喂给 LLM。</span></div>
+    </div></div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  电商智能平台 · 综合演示 Demo ｜ 数据为内置演示数据，不代表真实业务 ｜ 生成于 2026-10-12
+</footer>
+
+<script>
+/* ============================================================================
+   一、视图切换
+   ============================================================================ */
+(function () {
+  var tabs = document.querySelectorAll('.shell__tab')
+  var views = document.querySelectorAll('.view')
+  function activate(name) {
+    tabs.forEach(function (t) {
+      var on = t.dataset.view === name
+      t.classList.toggle('is-active', on)
+      t.setAttribute('aria-selected', on ? 'true' : 'false')
+    })
+    views.forEach(function (v) { v.classList.toggle('is-active', v.id === 'view-' + name) })
+    window.scrollTo({ top: 0 })
+  }
+  tabs.forEach(function (t) { t.addEventListener('click', function () { activate(t.dataset.view) }) })
+  document.querySelectorAll('[data-goto]').forEach(function (b) {
+    b.addEventListener('click', function () { activate(b.dataset.goto) })
+  })
+})()
+
+/* ============================================================================
+   二、共享工具
+   ============================================================================ */
+function el(tag, cls, text) {
+  var n = document.createElement(tag)
+  if (cls) n.className = cls
+  if (text !== undefined) n.textContent = text
+  return n
+}
+function nowTime() {
+  var d = new Date()
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0')
+}
+var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, REDUCED ? 0 : ms) }) }
+
+/* ============================================================================
+   三、总览：动态流
+   ============================================================================ */
+(function () {
+  var feed = document.getElementById('overview-feed')
+  var items = [
+    { sys: 'cs', icon: 'i-chat', text: '会话 #1247 转人工：用户 u1003 询问「iPhone 15 Pro 退款政策」，知识轨命中智库文档 3 个片段', time: '14:32' },
+    { sys: 'op', icon: 'i-rocket', text: '运营工作流 run#46 完成：为「蓝牙耳机 Air 3」生成促销策略，进入人工审批门禁', time: '14:18' },
+    { sys: 'kb', icon: 'i-book', text: '文档《iPhone 15 Pro 用户手册.pdf》解析入库：412 个向量块写入 Milvus', time: '13:57' },
+    { sys: 'cs', icon: 'i-chat', text: '数字人播报 86 次：平均口型同步延迟 240ms（WS 通道正常）', time: '13:40' },
+    { sys: 'op', icon: 'i-rocket', text: '质检 Agent 驳回 1 条策略：缺少价格合规依据（策略 v1.0.0）', time: '13:22' },
+    { sys: 'cs', icon: 'i-chat', text: '三轨引擎分流统计：任务 58% / 知识 31% / 闲聊 11%', time: '12:05' }
+  ]
+  items.forEach(function (it) {
+    var row = el('div', 'feed__item')
+    var ic = el('span', 'feed__icon feed__icon--' + it.sys)
+    ic.innerHTML = '<svg width="14" height="14" aria-hidden="true"><use href="#' + it.icon + '"/></svg>'
+    var tx = el('div', 'feed__text', it.text)
+    var tm = el('span', 'feed__time', it.time)
+    row.appendChild(ic); row.appendChild(tx); row.appendChild(tm)
+    feed.appendChild(row)
+  })
+})()
+
+/* ============================================================================
+   四、智能客服：三轨对话引擎（模拟）
+   ============================================================================ */
+var CS = (function () {
+  var stream = document.getElementById('cs-stream')
+  var form = document.getElementById('cs-form')
+  var input = document.getElementById('cs-input')
+  var chipsBox = document.getElementById('cs-chips')
+  var objList = document.getElementById('cs-obj-list')
+  var objCount = document.getElementById('cs-obj-count')
+  var connected = false
+  var busy = false
+
+  var ORDERS = [
+    { order_id: 'A20260410001', title: 'iPhone 15 Pro 256G 远峰蓝', status: '待发货', amount: '8999.00', created_at: '2026-04-10 10:00' },
+    { order_id: 'A20260408002', title: '降噪蓝牙耳机 Air 3', status: '运输中', amount: '1299.00', created_at: '2026-04-08 16:20' },
+    { order_id: 'A20260405003', title: '智能手表 Watch Fit 2', status: '已签收', amount: '1599.00', created_at: '2026-04-05 09:12' }
+  ]
+  var PRODUCTS = [
+    { product_id: 'P1001', title: 'iPhone 15 Pro 256G 远峰蓝', price: '8999.00', desc: 'A17 Pro 芯片 · 钛金属边框' },
+    { product_id: 'P1002', title: '降噪蓝牙耳机 Air 3', price: '1299.00', desc: '48dB 主动降噪 · 30h 续航' },
+    { product_id: 'P1003', title: '智能手表 Watch Fit 2', price: '1599.00', desc: '血氧监测 · 14 天续航' }
+  ]
+  var QUICK = ['我要退款', '查订单状态', '商品推荐', '退换货政策']
+
+  /* ── 三轨规则引擎（模拟 DialogueEngine 分流） ─────────────────────── */
+  function route(text) {
+    var t = text.trim()
+    if (/退款|退货|退钱/.test(t)) return { track: 'task', reply: '好的，我们优先处理退款申请。请问是全额退款还是部分退款？确认后我会为您创建退款工单（通常 1-3 个工作日原路退回）。' }
+    if (/订单|物流|到哪|发货/.test(t)) return { track: 'task', reply: '请提供订单号（如 A20260410001），我为您查询物流状态；也可以点击右侧「业务对象」中的订单直接发送给我。' }
+    if (/政策|运费|保修|多久|几天/.test(t)) return { track: 'kb', reply: '根据《售后政策手册》：自签收之日起 7 天内可无理由退换（保持完好），15 天内质量问题换新，全国联保 1 年。大促期间运费险自动生效。' }
+    if (/推荐|买什么|选哪/.test(t)) return { track: 'kb', reply: '为您推荐：降噪蓝牙耳机 Air 3（48dB 主动降噪，通勤场景口碑最佳）与智能手表 Watch Fit 2（健康监测入门首选）。可点击右侧商品查看详情。' }
+    if (/你好|在吗|嗨|hi/i.test(t)) return { track: 'chat', reply: '您好呀，我是小宝，您的专属电商客服～ 请问有什么可以帮您？' }
+    if (/谢谢|感谢/.test(t)) return { track: 'chat', reply: '不客气！后续有任何问题随时找我，祝您购物愉快 🌸' }
+    return { track: 'chat', reply: '嗯嗯，我在听。您可以问我订单、物流、退换货政策，或者直接告诉我需要什么帮助～' }
+  }
+
+  var TRACK_LABEL = { task: '任务轨', kb: '知识轨', chat: '闲聊轨' }
+
+  function addMsg(role, html, opts) {
+    opts = opts || {}
+    var row = el('div', 'msg msg--' + (role === 'user' ? 'out' : 'in'))
+    var av = el('span', 'msg__avatar', role === 'user' ? '你' : '宝')
+    var body = el('div')
+    var bubble = el('div', 'msg__bubble')
+    if (opts.track) {
+      var tag = el('span', 'msg__track msg__track--' + opts.track, TRACK_LABEL[opts.track])
+      bubble.appendChild(tag)
+    }
+    if (opts.object) {
+      var card = el('div', 'obj-card')
+      card.style.marginTop = '4px'
+      var tt = el('div', 'obj-card__title', (opts.objectType === 'order' ? '📦 ' : '🛍 ') + opts.object.title)
+      var rows = opts.object.rows || []
+      rows.forEach(function (r) {
+        var rr = el('div', 'obj-card__row')
+        rr.appendChild(el('span', r[0]))
+        rr.appendChild(el('b', r[1]))
+        card.appendChild(rr)
+      })
+      bubble.appendChild(card)
+    } else if (html) {
+      bubble.appendChild(document.createTextNode(html))
+    }
+    var meta = el('div', 'msg__meta', (role === 'user' ? '你' : '小宝') + ' · ' + nowTime())
+    body.appendChild(bubble); body.appendChild(meta)
+    row.appendChild(av); row.appendChild(body)
+    stream.appendChild(row)
+    stream.scrollTop = stream.scrollHeight
+    return { bubble: bubble, meta: meta }
+  }
+
+  async function botReply(text) {
+    busy = true
+    input.disabled = true
+    document.querySelectorAll('#cs-chips .chip').forEach(function (c) { c.disabled = true })
+    await sleep(500)
+    var r = route(text)
+    var m = addMsg('bot', '', { track: r.track })
+    /* 打字机效果：只更新专用文本节点，避免 textContent 全量覆盖冲掉轨次徽章 */
+    var textNode = document.createTextNode('')
+    m.bubble.appendChild(textNode)
+    var full = r.reply
+    if (REDUCED) {
+      textNode.nodeValue = full
+    } else {
+      for (var i = 0; i < full.length; i += 2) {
+        textNode.nodeValue = full.slice(0, i + 2)
+        stream.scrollTop = stream.scrollHeight
+        await sleep(28)
+      }
+      textNode.nodeValue = full
+    }
+    /* 数字人播报状态 */
+    if (connected) {
+      var t = el('span', 'badge badge--success', '播报中')
+      t.style.marginLeft = '6px'
+      m.meta.appendChild(t)
+      await sleep(1600)
+      t.textContent = '已播报'
+      t.className = 'badge badge--muted'
+      t.style.marginLeft = '6px'
+    }
+    busy = false
+    input.disabled = false
+    document.querySelectorAll('#cs-chips .chip').forEach(function (c) { c.disabled = false })
+    input.focus()
+  }
+
+  function sendText(text) {
+    if (busy || !text.trim()) return
+    addMsg('user', text)
+    botReply(text)
+  }
+
+  /* ── 数字人连接（状态模拟） ─────────────────────────────────────── */
+  var ring = document.getElementById('cs-avatar-ring')
+  var avatarText = document.getElementById('cs-avatar-text')
+  var avatarBadge = document.getElementById('cs-avatar-badge')
+  var wsDot = document.getElementById('cs-ws-dot')
+  var wsText = document.getElementById('cs-ws-text')
+  var connectBtn = document.getElementById('cs-connect-btn')
+  connectBtn.addEventListener('click', function () {
+    if (connected) {
+      connected = false
+      ring.classList.remove('is-live')
+      avatarText.innerHTML = '数字人未连接<br>点击下方按钮模拟连接'
+      avatarBadge.textContent = '未连接'
+      avatarBadge.className = 'badge badge--muted'
+      wsDot.classList.remove('is-open')
+      wsText.textContent = 'WS 通道未连接'
+      connectBtn.innerHTML = '<svg width="14" height="14" aria-hidden="true"><use href="#i-plug"/></svg>连接数字人'
+      return
+    }
+    connectBtn.disabled = true
+    avatarText.innerHTML = '正在加载数字人 42%…'
+    var p = 0
+    var timer = setInterval(function () {
+      p += 17
+      if (p >= 100) {
+        clearInterval(timer)
+        connected = true
+        ring.classList.add('is-live')
+        avatarText.innerHTML = '小宝已就绪<br>回复将自动语音播报'
+        avatarBadge.textContent = '已连接'
+        avatarBadge.className = 'badge badge--success'
+        wsDot.classList.add('is-open')
+        wsText.textContent = 'WS 通道已连接'
+        connectBtn.disabled = false
+        connectBtn.innerHTML = '<svg width="14" height="14" aria-hidden="true"><use href="#i-refresh"/></svg>销毁数字人'
+      } else {
+        avatarText.innerHTML = '正在加载数字人 ' + p + '%…'
+      }
+    }, REDUCED ? 0 : 220)
+  })
+
+  /* ── 业务对象栏 ─────────────────────────────────────────────────── */
+  var objTab = 'orders'
+  function renderObjs() {
+    objList.innerHTML = ''
+    var list = objTab === 'orders' ? ORDERS : PRODUCTS
+    objCount.textContent = list.length + ' 条'
+    list.forEach(function (item) {
+      var card = el('div', 'obj-card')
+      var title = el('div', 'obj-card__title')
+      title.innerHTML = '<svg width="13" height="13" aria-hidden="true"><use href="#' + (objTab === 'orders' ? 'i-layers' : 'i-bot') + '"/></svg>'
+      title.appendChild(document.createTextNode(item.title))
+      card.appendChild(title)
+      if (objTab === 'orders') {
+        ;[['订单号', item.order_id], ['状态', item.status], ['金额', '¥' + item.amount]].forEach(function (r) {
+          var row = el('div', 'obj-card__row')
+          row.appendChild(el('span', r[0])); row.appendChild(el('b', r[1]))
+          card.appendChild(row)
+        })
+      } else {
+        ;[['编号', item.product_id], ['价格', '¥' + item.price], ['简介', item.desc]].forEach(function (r) {
+          var row = el('div', 'obj-card__row')
+          row.appendChild(el('span', r[0])); row.appendChild(el('b', r[1]))
+          card.appendChild(row)
+        })
+      }
+      var btn = el('button', 'btn btn--sm', objTab === 'orders' ? '发送订单' : '发送商品')
+      btn.addEventListener('click', function () {
+        if (busy) return
+        var rows = objTab === 'orders'
+          ? [['订单号', item.order_id], ['状态', item.status], ['金额', '¥' + item.amount]]
+          : [['编号', item.product_id], ['价格', '¥' + item.price]]
+        addMsg('user', null, { object: { title: item.title, rows: rows }, objectType: objTab === 'orders' ? 'order' : 'product' })
+        botReply('对象消息：' + item.title)
+      })
+      card.appendChild(btn)
+      objList.appendChild(card)
+    })
+  }
+  document.querySelectorAll('[data-objtab]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-objtab]').forEach(function (x) { x.classList.toggle('is-active', x === b) })
+      objTab = b.dataset.objtab
+      renderObjs()
+    })
+  })
+
+  /* ── 快捷问题 / 表单 / 新对话 ───────────────────────────────────── */
+  QUICK.forEach(function (q) {
+    var c = el('button', 'chip', q)
+    c.type = 'button'
+    c.addEventListener('click', function () { sendText(q) })
+    chipsBox.appendChild(c)
+  })
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+    var t = input.value
+    input.value = ''
+    sendText(t)
+  })
+  document.getElementById('cs-reset-btn').addEventListener('click', function () {
+    stream.innerHTML = ''
+    stream.appendChild(el('span', 'stream__day', '今天'))
+    addMsg('bot', '您好，我是小宝，您的专属电商客服。新的对话已开始，请问有什么可以帮您？')
+  })
+
+  renderObjs()
+  addMsg('bot', '您好，我是小宝，您的专属电商客服～ 可以问我订单、物流、退换货政策，或从右侧发送业务对象给我。')
+})()
+
+/* ============================================================================
+   五、商品运营：多 Agent 工作流（模拟）
+   ============================================================================ */
+var OP = (function () {
+  var flow = document.getElementById('op-flow')
+  var logBox = document.getElementById('op-log')
+  var report = document.getElementById('op-report')
+  var statusBadge = document.getElementById('op-status-badge')
+  var runBtn = document.getElementById('op-run-btn')
+  var productList = document.getElementById('op-product-list')
+
+  var PRODUCTS = [
+    { id: 'P1001', name: 'iPhone 15 Pro 256G 远峰蓝', sales: '月销 342', rate: '4.8' },
+    { id: 'P1002', name: '降噪蓝牙耳机 Air 3', sales: '月销 1,208', rate: '4.6' },
+    { id: 'P1003', name: '智能手表 Watch Fit 2', sales: '月销 567', rate: '4.7' }
+  ]
+  var NODES = [
+    { key: 'context', name: '商品上下文 Agent', desc: 'product_context.read · 汇总商品、库存与舆情', icon: '1' },
+    { key: 'diagnosis', name: '诊断 Agent', desc: 'model.complete · 输出机会点与风险', icon: '2' },
+    { key: 'creative', name: '创意策略 Agent', desc: 'model.complete · 生成促销与内容策略', icon: '3' },
+    { key: 'quality', name: '质量审查 Agent', desc: '合规校验 · 价格与广告法检查', icon: '4' },
+    { key: 'gate', name: '人工审批门禁', desc: 'human_review_gate · LangGraph interrupt', icon: '5', gate: true },
+    { key: 'finalize', name: '定稿落库', desc: 'agent_output.persist · 写入策略库', icon: '6' }
+  ]
+
+  var selected = PRODUCTS[0]
+  var running = false
+
+  /* 商品列表 */
+  PRODUCTS.forEach(function (p) {
+    var b = el('button', 'prod-item' + (p === selected ? ' is-active' : ''))
+    b.type = 'button'
+    b.appendChild(el('span', 'prod-item__name', p.name))
+    var meta = el('div', 'prod-item__meta')
+    meta.appendChild(el('span', p.sales))
+    meta.appendChild(el('span', '评分 ' + p.rate))
+    b.appendChild(meta)
+    b.addEventListener('click', function () {
+      if (running) return
+      selected = p
+      productList.querySelectorAll('.prod-item').forEach(function (x) { x.classList.toggle('is-active', x === b) })
+      resetRun()
+    })
+    productList.appendChild(b)
+  })
+
+  /* 工作流节点 */
+  function buildFlow() {
+    flow.innerHTML = ''
+    NODES.forEach(function (n) {
+      var row = el('div', 'flow__node')
+      row.dataset.key = n.key
+      var ic = el('span', 'flow__icon', n.icon)
+      var info = el('div', 'flow__info')
+      info.appendChild(el('div', 'flow__name', n.name))
+      info.appendChild(el('div', 'flow__desc', n.desc))
+      var st = el('span', 'flow__state', '待运行')
+      row.appendChild(ic); row.appendChild(info); row.appendChild(st)
+      flow.appendChild(row)
+    })
+  }
+
+  function log(text, cls) {
+    var line = el('div', 'op-log__line')
+    if (cls) line.innerHTML = '<' + cls + '>' + text + '</' + cls + '>'
+    else line.textContent = text
+    logBox.appendChild(line)
+    logBox.scrollTop = logBox.scrollHeight
+  }
+
+  function setNodeState(key, state) {
+    var node = flow.querySelector('[data-key="' + key + '"]')
+    if (!node) return
+    node.classList.toggle('is-running', state === 'running')
+    node.classList.toggle('is-done', state === 'done')
+    var st = node.querySelector('.flow__state')
+    st.textContent = state === 'running' ? '执行中…' : state === 'done' ? '完成' : '待运行'
+  }
+
+  function section(title, inner) {
+    var box = el('div', 'op-report__section')
+    box.appendChild(el('h4', null, title))
+    if (typeof inner === 'string') box.appendChild(el('p', null, inner))
+    else box.appendChild(inner)
+    return box
+  }
+
+  var REPORTS = {
+    diagnosis: {
+      title: '诊断报告',
+      html: '<p>机会点：搜索量周环比 +38%，但转化率低于类目均值 1.9pt；差评关键词集中在「充电速度」（占比 27%）。</p><ul><li>价格带处于类目 P65，具备促销空间</li><li>详情页缺少快充场景演示视频</li><li>竞品 A 以「买赠保护套」抢量，需对冲</li></ul>'
+    },
+    creative: {
+      title: '创意策略',
+      html: '<p>主策略：限时 3 天「快充升级套装」——主机 + 30W 氮化镓充电器组合价 ¥1,399（省 ¥200）。</p><ul><li>标题：强调「18 分钟快充 50%」</li><li>素材：新增充电场景 15s 短视频</li><li>渠道：店铺首页弹窗 + 短信召回沉默用户</li></ul>'
+    },
+    quality: {
+      title: '质检报告',
+      html: '<p>合规检查通过 3/3：价格标注含划线价依据；无绝对化用语；赠品库存已确认。</p><ul><li>风险提示：短信文案需避开「最低价」表述（已自动替换）</li></ul>'
+    }
+  }
+
+  function resetRun() {
+    running = false
+    buildFlow()
+    logBox.innerHTML = ''
+    log('已选择商品：' + selected.name + '（' + selected.id + '）', 'b')
+    log('等待启动…点击「开始诊断」运行工作流。')
+    statusBadge.textContent = '未运行'
+    statusBadge.className = 'badge badge--muted'
+    report.innerHTML = ''
+    report.appendChild(el('p', null, '尚无产出。运行工作流后，这里会依次展示诊断报告、创意策略与质检报告，最后进入人工审批门禁。'))
+    report.firstChild.style.fontSize = '12px'
+    report.firstChild.style.color = 'var(--text-muted)'
+    runBtn.disabled = false
+  }
+
+  async function run() {
+    if (running) return
+    running = true
+    runBtn.disabled = true
+    report.innerHTML = ''
+    statusBadge.textContent = '运行中'
+    statusBadge.className = 'badge badge--primary'
+    log('▶ 工作流启动：product_operation v1.0.0 · run#' + (47 + Math.floor(Math.random() * 50)), 'b')
+
+    /* 1 商品上下文 */
+    setNodeState('context', 'running')
+    log('  [1/6] product_context_agent 读取商品上下文…')
+    await sleep(900)
+    setNodeState('context', 'done')
+    log('  [1/6] ✓ 上下文就绪：类目 / 价格带 / 库存 / 近 90 天舆情', 'i')
+
+    /* 2 诊断 */
+    setNodeState('diagnosis', 'running')
+    log('  [2/6] diagnosis_agent 调用模型生成诊断…')
+    await sleep(1200)
+    setNodeState('diagnosis', 'done')
+    log('  [2/6] ✓ 诊断完成：2 个机会点 / 1 个风险')
+    var d = REPORTS.diagnosis
+    report.appendChild(section(d.title, d.html))
+
+    /* 3 创意 */
+    setNodeState('creative', 'running')
+    log('  [3/6] creative_strategy_agent 生成策略草案…')
+    await sleep(1200)
+    setNodeState('creative', 'done')
+    log('  [3/6] ✓ 策略草案完成：1 主策略 + 3 执行项')
+    var c = REPORTS.creative
+    report.appendChild(section(c.title, c.html))
+
+    /* 4 质检 */
+    setNodeState('quality', 'running')
+    log('  [4/6] quality_review_agent 合规校验…')
+    await sleep(1000)
+    setNodeState('quality', 'done')
+    log('  [4/6] ✓ 质检通过（自动替换 1 处违规表述）')
+    var q = REPORTS.quality
+    report.appendChild(section(q.title, q.html))
+
+    /* 5 审批门禁 */
+    setNodeState('gate', 'running')
+    log('  [5/6] human_review_gate 中断等待人工审批…', 'i')
+    statusBadge.textContent = '待审批'
+    statusBadge.className = 'badge badge--warning'
+    var gate = el('div', 'op-gate')
+    gate.appendChild(el('div', 'op-gate__text', '⚠ 该策略需要您审批后才会生效（模拟人工门禁）'))
+    var actions = el('div', 'op-gate__actions')
+    var approve = el('button', 'btn btn--success btn--sm', '通过并定稿')
+    var reject = el('button', 'btn btn--danger btn--sm', '驳回')
+    actions.appendChild(approve); actions.appendChild(reject)
+    gate.appendChild(actions)
+    report.appendChild(gate)
+
+    await new Promise(function (resolve) {
+      approve.addEventListener('click', function () {
+        log('  [5/6] ✓ 人工审批：通过', 'i')
+        resolve(true)
+      })
+      reject.addEventListener('click', function () {
+        log('  [5/6] ✗ 人工审批：驳回', 'i')
+        resolve(false)
+      })
+    }).then(async function (ok) {
+      gate.querySelectorAll('button').forEach(function (b) { b.disabled = true })
+      setNodeState('gate', 'done')
+      if (!ok) {
+        statusBadge.textContent = '已驳回'
+        statusBadge.className = 'badge badge--danger'
+        log('✗ 工作流结束：策略被驳回，未落库。', 'b')
+        running = false
+        runBtn.disabled = false
+        return
+      }
+      /* 6 定稿 */
+      setNodeState('finalize', 'running')
+      log('  [6/6] finalize_output 持久化策略…')
+      await sleep(800)
+      setNodeState('finalize', 'done')
+      log('  [6/6] ✓ 策略已写入策略库（strategy#1042）')
+      log('✔ 工作流完成：status = completed', 'b')
+      statusBadge.textContent = '已完成'
+      statusBadge.className = 'badge badge--success'
+      running = false
+      runBtn.disabled = false
+    })
+  }
+
+  runBtn.addEventListener('click', run)
+  resetRun()
+})()
+
+/* ============================================================================
+   六、智能智库：RAG 问答（模拟）
+   ============================================================================ */
+var KB = (function () {
+  var form = document.getElementById('kb-form')
+  var input = document.getElementById('kb-input')
+  var answerBox = document.getElementById('kb-answer')
+  var chunksBox = document.getElementById('kb-chunks')
+  var chipsBox = document.getElementById('kb-chips')
+  var docList = document.getElementById('kb-doc-list')
+  var pipeNodes = document.querySelectorAll('.pipe-node')
+  var busy = false
+
+  var DOCS = [
+    { name: 'iPhone 15 Pro 用户手册.pdf', meta: '412 chunks · 2.1MB', type: 'pdf' },
+    { name: '蓝牙耳机 Air 3 说明书.pdf', meta: '186 chunks · 0.9MB', type: 'pdf' },
+    { name: '智能手表 Watch Fit 2 指南.pdf', meta: '243 chunks · 1.4MB', type: 'pdf' },
+    { name: '售后政策手册 v3.md', meta: '64 chunks · 28KB', type: 'md' },
+    { name: '退换货流程图解.md', meta: '38 chunks · 15KB', type: 'md' }
+  ]
+  var PRESET = [
+    { q: 'iPhone 15 Pro 的电池容量是多少？', a: 'iPhone 15 Pro 内置 3274mAh 锂离子充电电池（典型值），支持 20W 及以上有线快充、15W MagSafe 磁吸充电与 7.5W Qi 无线充电。官方实测视频播放最长可达 23 小时。' },
+    { q: 'Air 3 耳机怎么恢复出厂设置？', a: '恢复出厂设置：将耳机放入充电盒，开盖，长按充电盒背面按键 15 秒，直至指示灯红灯闪烁 3 次后熄灭。重置后需删除手机蓝牙记录并重新配对。' },
+    { q: '手表进水了还能保修吗？', a: 'Watch Fit 2 支持 5ATM 防水（50 米静态水压），但因进水损坏通常不在保修范围内——液体损坏标识（LCI）变红即判定为进水。建议先送检，客服可协助申请有偿维修。' }
+  ]
+
+  DOCS.forEach(function (d) {
+    var b = el('button', 'doc-item')
+    b.type = 'button'
+    var ic = el('span', 'doc-item__icon doc-item__icon--' + d.type, d.type.toUpperCase())
+    var box = el('div')
+    box.appendChild(el('div', 'doc-item__name', d.name))
+    box.appendChild(el('div', 'doc-item__meta', d.meta))
+    b.appendChild(ic); b.appendChild(box)
+    b.addEventListener('click', function () {
+      input.value = '根据《' + d.name.replace(/\.(pdf|md)$/, '') + '》：'
+      input.focus()
+    })
+    docList.appendChild(b)
+  })
+
+  PRESET.forEach(function (p) {
+    var c = el('button', 'chip', p.q)
+    c.type = 'button'
+    c.addEventListener('click', function () { ask(p.q) })
+    chipsBox.appendChild(c)
+  })
+
+  function setPipe(key, state) {
+    pipeNodes.forEach(function (n) {
+      if (n.dataset.pipe !== key) return
+      n.classList.toggle('is-active', state === 'active')
+      n.classList.toggle('is-done', state === 'done')
+    })
+  }
+  function resetPipe() {
+    pipeNodes.forEach(function (n) { n.classList.remove('is-active', 'is-done') })
+  }
+
+  function renderChunks(q) {
+    chunksBox.innerHTML = ''
+    var hits = [
+      { doc: 'iPhone 15 Pro 用户手册.pdf', score: 0.94, text: '电池：内置 3274mAh 锂离子充电电池。充电：20W 有线快充约 30 分钟充至 50%；15W MagSafe；7.5W Qi 无线。' },
+      { doc: 'iPhone 15 Pro 用户手册.pdf', score: 0.88, text: '续航：视频播放最长 23 小时，流媒体视频最长 20 小时，音频播放最长 75 小时。' },
+      { doc: '售后政策手册 v3.md', score: 0.71, text: '电池健康度低于 80% 且在三包期内，可享受免费电池更换服务。' }
+    ]
+    hits.forEach(function (h) {
+      var box = el('div', 'kb-chunk')
+      var head = el('div', 'kb-chunk__head')
+      head.appendChild(el('span', h.doc))
+      head.appendChild(el('span', 'rerank ' + h.score.toFixed(2)))
+      box.appendChild(head)
+      box.appendChild(el('div', 'kb-chunk__text', h.text))
+      chunksBox.appendChild(box)
+    })
+  }
+
+  async function typeAnswer(text) {
+    answerBox.innerHTML = ''
+    if (REDUCED) { answerBox.textContent = text; return }
+    var caret = el('span', 'kb-caret')
+    answerBox.appendChild(caret)
+    for (var i = 0; i < text.length; i += 2) {
+      caret.before(document.createTextNode(text.slice(i, i + 2)))
+      await sleep(24)
+    }
+    caret.remove()
+  }
+
+  async function ask(q) {
+    if (busy || !q.trim()) return
+    busy = true
+    input.disabled = true
+    chipsBox.querySelectorAll('.chip').forEach(function (c) { c.disabled = true })
+    resetPipe()
+    answerBox.innerHTML = ''
+    chunksBox.innerHTML = ''
+    chunksBox.appendChild(el('p', null, '检索中…')).style.fontSize = '12px'
+
+    /* 管线动画 */
+    setPipe('confirm', 'active'); await sleep(700); setPipe('confirm', 'done')
+    setPipe('search', 'active'); await sleep(1000); setPipe('search', 'done')
+    setPipe('rrf', 'active'); await sleep(600); setPipe('rrf', 'done')
+    setPipe('rerank', 'active'); await sleep(700); setPipe('rerank', 'done')
+    renderChunks(q)
+    setPipe('gen', 'active')
+    var preset = PRESET.find(function (p) { return p.q === q })
+    var answer = preset
+      ? preset.a
+      : '已根据知识库检索结果回答：' + q.replace(/[？?]/g, '') + '。相关内容见右侧召回片段——演示环境下答案由内置语料生成，真实环境由 Qwen 基于 rerank 后的 chunk 流式输出。'
+    await typeAnswer(answer)
+    setPipe('gen', 'done')
+
+    busy = false
+    input.disabled = false
+    chipsBox.querySelectorAll('.chip').forEach(function (c) { c.disabled = false })
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+    var q = input.value
+    input.value = ''
+    ask(q)
+  })
+})()
+</script>
+</body>
+</html>
