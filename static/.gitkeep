@@ -1,0 +1,1 @@
+# 占位文件：api/app.py 以 StaticFiles 挂载 /static，目录必须存在
