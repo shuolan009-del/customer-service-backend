@@ -19,6 +19,7 @@ import { useToast } from '../composables/useToast'
 import { useConfirm } from '../composables/useConfirm'
 import { navigate } from '../router/useRoute'
 import { DEFAULT_SENDER_ID } from '../config/service'
+import { withPrefix } from '../config/api-base'
 import { readPrefs, writePrefs } from '../utils/prefs'
 
 const toast = useToast()
@@ -80,7 +81,7 @@ async function loadStatus() {
   statusLoading.value = true
   statusError.value = ''
   try {
-    status.value = await fetchJson('/api/avatar/status')
+    status.value = await fetchJson(withPrefix('/api/avatar/status'))
   } catch (error) {
     statusError.value = error?.message || '获取数字人状态失败。'
     status.value = null
@@ -93,7 +94,7 @@ async function loadConsume() {
   consumeLoading.value = true
   consumeError.value = ''
   try {
-    consume.value = await fetchJson('/api/avatar/consume-record')
+    consume.value = await fetchJson(withPrefix('/api/avatar/consume-record'))
   } catch (error) {
     consumeError.value = error?.message || '获取积分消耗记录失败。'
     consume.value = null

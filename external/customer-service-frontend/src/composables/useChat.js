@@ -5,6 +5,7 @@ import { toFriendlyMessage } from '../utils/error'
 import * as timeline from '../utils/timeline'
 import { EARLIER_KEY, dayKeyOf, formatClock, formatDayLabel } from '../utils/format'
 import { DEFAULT_SENDER_ID } from '../config/service'
+import { withPrefix } from '../config/api-base'
 
 /**
  * 对话核心：消息列表（按自然日分组）、发送、历史加载、滚动与未读。
@@ -43,7 +44,7 @@ avatar.setHooks({
 })
 
 const historyEndpoint = computed(
-  () => `/api/chat/history?sender_id=${encodeURIComponent(senderId.value.trim())}`,
+  () => withPrefix(`/api/chat/history?sender_id=${encodeURIComponent(senderId.value.trim())}`),
 )
 
 // ── 消息构造 ────────────────────────────────────────────────────────
@@ -270,7 +271,7 @@ async function sendPayload(payload) {
   }
 
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(withPrefix('/api/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sender_id: senderId.value.trim(), ...payload }),

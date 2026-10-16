@@ -2,6 +2,7 @@
 import { useRoute, navigate } from '../../router/useRoute'
 import { NAV_ITEMS } from '../../router/routes'
 import { useNetwork } from '../../composables/useNetwork'
+import { PORTAL_URL } from '../../config/api-base'
 import Icon from '../ui/Icon.vue'
 
 const route = useRoute()
@@ -24,9 +25,11 @@ function go(path) {
           aria-label="返回工作台"
           @click="go('/')"
         >
-          <span class="brand__mark" aria-hidden="true"><Icon name="chat" :size="16" /></span>
-          <span class="brand__text">电商小二</span>
-          <span class="brand__sub">智能客服系统</span>
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="cs-brand-g" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#66BB6A"/><stop offset="1" stop-color="#2E7D32"/></linearGradient></defs><circle cx="24" cy="24" r="21" stroke="url(#cs-brand-g)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="brand__text">AI客服助手</span>
+          <span class="brand__sub">禾语农产品智能商管平台</span>
         </button>
 
         <nav class="nav" aria-label="主导航">
@@ -45,6 +48,10 @@ function go(path) {
         </nav>
 
         <div class="topbar__right">
+          <a class="back-portal" :href="PORTAL_URL" target="_blank" rel="noopener" title="打开禾语农产品智能商管平台门户">
+            <Icon name="external" :size="14" />
+            <span>返回门户</span>
+          </a>
           <span
             class="status-pill"
             :class="online ? 'status-pill--online' : 'status-pill--offline'"
@@ -188,6 +195,27 @@ function go(path) {
   align-items: center;
   gap: var(--space-3);
   flex-shrink: 0;
+}
+
+.back-portal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 28px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-in-out);
+}
+.back-portal:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-soft-bg);
 }
 
 .status-pill {

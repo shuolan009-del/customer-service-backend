@@ -36,10 +36,16 @@ const { draftMessage, isSending, sendTextMessage } = useChat()
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px solid var(--border-light);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--bubble-in-border);
   background: var(--surface);
   flex-shrink: 0;
+}
+
+/* 聊天输入框比表单输入更柔和：浅绿浅边 + 大圆角 */
+.composer :deep(.input) {
+  border-color: var(--bubble-in-border);
+  border-radius: var(--radius-lg);
 }
 
 /* 与 AppInput（46px）齐平 */

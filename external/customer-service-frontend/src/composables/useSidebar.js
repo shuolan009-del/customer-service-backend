@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { withPrefix } from '../config/api-base'
 
 /**
  * 右侧「业务对象」栏数据（订单 / 商品列表）。
@@ -29,8 +30,8 @@ export function useSidebar() {
     isLoading.value = true
     try {
       const [ordersResponse, productsResponse] = await Promise.all([
-        fetch(`/commerce/users/${encodeURIComponent(sid)}/orders`),
-        fetch(`/commerce/users/${encodeURIComponent(sid)}/products`),
+        fetch(withPrefix(`/commerce/users/${encodeURIComponent(sid)}/orders`)),
+        fetch(withPrefix(`/commerce/users/${encodeURIComponent(sid)}/products`)),
       ])
 
       const [ordersPayload, productsPayload] = await Promise.all([

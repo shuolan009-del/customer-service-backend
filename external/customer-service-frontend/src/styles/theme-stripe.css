@@ -1,0 +1,157 @@
+/* ============================================================================
+   theme-stripe.css —— 「02 · Stripe」风格主题层（2026-10-16 选定）
+   ----------------------------------------------------------------------------
+   · 背景：UI 优化多方案中选定「02 · Stripe」（Indigo #635BFF + 双层柔影 + 渐变主按钮）。
+   · 做法：只覆盖「品牌令牌默认值」+ 少量部件级样式，零组件逻辑改动；
+           品牌包本体（jiahe-brand-tokens.css，同步文件）未动。
+   · 回退：删除 main.js 中本文件的一行 import 即回到「嘉禾绿」默认外观，
+           已补齐的圆角/阴影别名（design-tokens.css 兼容别名段）保留不受影响。
+   · 选择器说明：组件样式均带 scoped [data-v-*] 属性，故本文件用更高特异性
+           （如 body .shell .brand__mark）覆盖，不依赖加载顺序。
+   ============================================================================ */
+
+:root {
+  /* ── 主色 → Stripe Indigo ─────────────────────────────────────────── */
+  --primary: #635BFF;
+  --primary-hover: #5851EA;
+  --primary-active: #5348E8;
+  --primary-soft: #DCD9FF;
+  --primary-soft-bg: #F0EFFF;
+  --on-primary: #FFFFFF;
+
+  /* ── 语义色（对齐 Stripe 系色卡）──────────────────────────────────── */
+  --success: #0D9B6C;
+  --success-soft: #E6F7F0;
+  --warning: #B25E09;
+  --warning-soft: #FFF4E5;
+  --danger: #DF1B41;
+  --danger-soft: #FFE9ED;
+  --info: #0A6CFF;
+  --info-soft: #EAF1FF;
+
+  /* ── 表面 / 边框 / 文字 ───────────────────────────────────────────── */
+  --surface: #FFFFFF;
+  --surface-raised: #F6F9FC;
+  --surface-hover: #F1F4FA;
+  --surface-field: #FFFFFF;
+  --border: #E6EBF1;
+  --border-light: #EFF3F8;
+  --border-strong: #D5DEE8;
+  --text-primary: #0A2540;
+  --text-secondary: #425466;
+  --text-muted: #6B7C93;
+
+  /* ── 圆角（更收敛的 8 / 14 台阶）──────────────────────────────────── */
+  --r-xs: 4px;
+  --r-sm: 7px;
+  --r-md: 8px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+
+  /* ── 阴影（Stripe 经典双层柔影）──────────────────────────────────── */
+  --sh-sm: 0 2px 5px rgba(50, 50, 93, .08), 0 8px 20px rgba(50, 50, 93, .07);
+  --sh-md: 0 4px 12px rgba(50, 50, 93, .10), 0 16px 40px rgba(50, 50, 93, .10);
+  --sh-lg: 0 10px 24px rgba(50, 50, 93, .12), 0 30px 60px rgba(50, 50, 93, .14);
+  --shadow-xs: 0 1px 2px rgba(50, 50, 93, .06);
+
+  /* ── 焦点环 ───────────────────────────────────────────────────────── */
+  --focus: 0 0 0 4px rgba(99, 91, 255, .18);
+
+  /* ── 聊天气泡（白底描边来息 / 浅紫去息）────────────────────────────── */
+  --bubble-r: 14px;
+  --bubble-r-tail: 6px;
+  --bubble-in-bg: #FFFFFF;
+  --bubble-in-border: #E6EBF1;
+  --bubble-shadow: 0 2px 5px rgba(50, 50, 93, .06), 0 8px 20px rgba(50, 50, 93, .07);
+  --bubble-group-gap: 6px;
+}
+
+/* ── 页面氛围底：顶部双色柔光（对应设计稿 02 的页底）───────────────────
+   双类选择器用于盖过 AppShell 的 scoped `.shell` 背景。 */
+body .shell.shell {
+  background:
+    radial-gradient(1100px 460px at 10% -6%, rgba(99, 91, 255, .10), transparent 60%),
+    radial-gradient(900px 420px at 92% -6%, rgba(0, 212, 255, .09), transparent 62%),
+    var(--surface-raised);
+  background-attachment: fixed;
+}
+
+/* ── 顶栏：白玻璃 + 一条极细的 indigo 底线 ────────────────────────────── */
+body .shell > .topbar {
+  background: rgba(255, 255, 255, .86);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  box-shadow: 0 1px 0 rgba(99, 91, 255, .06);
+}
+
+/* ── 品牌标：白底 + 柔影（logo 图形保持品牌色）────────────────────────── */
+body .shell .brand__mark {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(99, 91, 255, .28);
+}
+
+/* ── 导航激活态：浅紫药丸，去掉默认下划线 ─────────────────────────────── */
+body .shell .nav__item.is-active::after { display: none; }
+
+/* ── 主按钮：indigo 渐变 + 投影 ───────────────────────────────────────── */
+body .btn.btn--primary {
+  background: linear-gradient(135deg, #7B74FF 0%, #635BFF 55%, #5348E8 100%);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(99, 91, 255, .30);
+}
+body .btn.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #857EFF 0%, #6C65FF 55%, #5B51F0 100%);
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgba(99, 91, 255, .36);
+}
+body .btn.btn--primary:active:not(:disabled) {
+  background: linear-gradient(135deg, #6E66F5 0%, #5750E0 100%);
+}
+
+/* ── 分段控件：灰蓝容器 + 白色激活块（对齐设计稿右栏）────────────────── */
+body .shell .segmented {
+  display: flex;
+  width: 100%;
+  gap: 3px;
+  padding: 3px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+body .shell .segmented__item {
+  flex: 1;
+  min-width: 0;
+  min-height: 32px;
+  padding: 6px 12px;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+body .shell .segmented__item:hover:not(.is-active) {
+  background: transparent;
+  color: var(--color-text-primary);
+}
+body .shell .segmented__item.is-active {
+  background: #FFFFFF;
+  border-color: transparent;
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 4px rgba(50, 50, 93, .14);
+}
+
+/* ── 用户消息气泡：浅紫底 + 淡紫描边（深一档的文字）──────────────────── */
+body .row.row--out .bubble:not(.bubble--object) {
+  background: var(--color-primary-soft-bg);
+  border-color: var(--color-primary-soft);
+  color: #3B34C9;
+}
+
+/* ── 数字人舞台：顶部淡紫辉光 + 底部一抹青色（对齐设计稿）────────────── */
+body .avatar-panel .avatar-panel__stage {
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--color-primary-soft-bg), transparent 62%),
+    radial-gradient(70% 42% at 50% 100%, rgba(0, 212, 255, .10), transparent 72%),
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-raised) 100%);
+}

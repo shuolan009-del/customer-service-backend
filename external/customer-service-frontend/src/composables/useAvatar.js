@@ -2,6 +2,7 @@ import { computed, reactive, ref } from 'vue'
 import { useAvatarWs } from './useAvatarWs'
 import { useToast } from './useToast'
 import { safeUuid } from '../utils/id'
+import { withPrefix } from '../config/api-base'
 
 /**
  * 数字人（魔珐星云）能力单例。
@@ -197,7 +198,7 @@ async function init() {
     }
 
     // 1. 凭证从后端取（App Secret 只存在后端 .env，前端不硬编码）
-    const response = await fetch('/api/avatar/session', {
+    const response = await fetch(withPrefix('/api/avatar/session'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),

@@ -74,8 +74,8 @@ const showCover = computed(() => Boolean(coverUrl.value) && !imageFailed.value)
   gap: var(--space-3);
   align-items: stretch;
   padding: var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--bubble-in-border);
+  border-radius: var(--radius-lg);
   background: var(--surface);
   width: min(320px, 100%);
 }

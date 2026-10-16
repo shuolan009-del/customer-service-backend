@@ -208,10 +208,10 @@ function handleCopy(message) {
 }
 
 .day__label span {
-  padding: 3px 12px;
-  border: 1px solid var(--border);
+  padding: 4px 13px;
+  border: 1px solid var(--bubble-in-border);
   border-radius: var(--radius-full);
-  background: var(--surface-hover);
+  background: var(--color-primary-soft-bg);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
@@ -252,10 +252,11 @@ function handleCopy(message) {
 }
 
 .welcome__chip {
-  padding: 8px 18px;
-  border: 1px solid var(--border);
+  padding: 9px 20px;
+  border: 1px solid var(--bubble-in-border);
   border-radius: var(--radius-full);
   background: var(--surface);
+  box-shadow: var(--bubble-shadow);
   color: var(--color-text-primary);
   font-size: var(--text-base);
   font-weight: var(--weight-medium);
@@ -305,11 +306,12 @@ function handleCopy(message) {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 10px var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  border-top-left-radius: var(--radius-xs);
-  background: var(--surface);
+  padding: 11px 14px;
+  border: 1px solid var(--bubble-in-border);
+  border-radius: var(--bubble-r);
+  border-top-left-radius: var(--bubble-r-tail);
+  background: var(--bubble-in-bg);
+  box-shadow: var(--bubble-shadow);
 }
 
 .typing__dots {
@@ -351,11 +353,11 @@ function handleCopy(message) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  border: 1px solid var(--border-strong);
+  padding: 8px 15px;
+  border: 1px solid var(--bubble-in-border);
   border-radius: var(--radius-full);
   background: var(--surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--bubble-shadow);
   color: var(--color-primary);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);

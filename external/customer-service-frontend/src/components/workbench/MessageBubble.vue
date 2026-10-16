@@ -140,7 +140,7 @@ const debugLabel = computed(() => {
 }
 
 .row + .row--grouped {
-  margin-top: var(--space-1);
+  margin-top: var(--bubble-group-gap);
 }
 
 .row--out {
@@ -197,33 +197,35 @@ const debugLabel = computed(() => {
 
 .bubble {
   position: relative;
-  padding: 10px var(--space-3);
-  border: 1px solid var(--border);
-  background: var(--surface);
+  padding: 11px 14px;
+  border: 1px solid var(--bubble-in-border);
+  background: var(--bubble-in-bg);
+  box-shadow: var(--bubble-shadow);
   font-size: var(--text-md);
   line-height: var(--leading-relaxed);
   color: var(--color-text-primary);
   /* 默认（single）：靠发送者一侧上下折角 */
-  border-radius: var(--radius-lg);
+  border-radius: var(--bubble-r);
 }
 
 /* ── 折角：紧贴头像一侧收紧上角，同组内再收紧下角 → 一组的观感 ───────── */
 .row--in .bubble {
-  border-top-left-radius: var(--radius-xs);
+  border-top-left-radius: var(--bubble-r-tail);
 }
 .row--in.row--head .bubble,
 .row--in.row--middle .bubble {
-  border-bottom-left-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--bubble-r-tail);
 }
 
 .row--out .bubble {
   background: var(--color-primary-soft);
-  border-color: var(--color-primary-soft);
-  border-top-right-radius: var(--radius-xs);
+  border-color: transparent;
+  box-shadow: var(--bubble-shadow);
+  border-top-right-radius: var(--bubble-r-tail);
 }
 .row--out.row--head .bubble,
 .row--out.row--middle .bubble {
-  border-bottom-right-radius: var(--radius-xs);
+  border-bottom-right-radius: var(--bubble-r-tail);
 }
 
 /* 对象消息自带卡片外壳，气泡层退掉 */
@@ -231,6 +233,7 @@ const debugLabel = computed(() => {
   padding: 0;
   border: none;
   background: transparent;
+  box-shadow: none;
 }
 
 .bubble__text {
@@ -319,7 +322,7 @@ const debugLabel = computed(() => {
 }
 
 .chip {
-  padding: 5px 12px;
+  padding: 6px 14px;
   border: 1px solid var(--color-primary-soft);
   border-radius: var(--radius-full);
   background: var(--color-primary-soft-bg);

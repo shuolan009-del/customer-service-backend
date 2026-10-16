@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import { withPrefix } from '../config/api-base'
 
 /**
  * 数字人聊天通道（WS /ws/avatar/chat）引擎。
@@ -19,7 +20,7 @@ let manualClose = false
 
 function buildUrl() {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  return `${protocol}//${window.location.host}/ws/avatar/chat`
+  return `${protocol}//${window.location.host}${withPrefix('/ws/avatar/chat')}`
 }
 
 export function useAvatarWs() {

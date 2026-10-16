@@ -23,6 +23,7 @@ import { getStatusVariant } from '../utils/status'
 import { getObjectTitle, getObjectSummary } from '../utils/format'
 import { navigate } from '../router/useRoute'
 import { customerService, userProfile, DEFAULT_SENDER_ID } from '../config/service'
+import { withPrefix } from '../config/api-base'
 
 const toast = useToast()
 
@@ -71,7 +72,7 @@ async function load() {
   loading.value = true
   errorText.value = ''
   try {
-    const response = await fetch(`/api/chat/history?sender_id=${encodeURIComponent(id)}`)
+    const response = await fetch(withPrefix(`/api/chat/history?sender_id=${encodeURIComponent(id)}`))
     const payload = await response.json()
     if (!response.ok) {
       throw new Error(payload?.detail || '加载会话记录失败。')

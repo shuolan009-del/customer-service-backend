@@ -2,6 +2,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './styles/design-tokens.css'
 import './styles/base.css'
+/* 「02 · Stripe」主题层 —— 2026-10-16 试上线后按用户要求改回品牌绿，暂停启用。
+   如需再启用：取消下一行注释即可（别名修复不受影响）。 */
+// import './styles/theme-stripe.css'
 import { readPrefs } from './utils/prefs'
 
 /**

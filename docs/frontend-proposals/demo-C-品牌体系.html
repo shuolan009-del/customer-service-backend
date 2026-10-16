@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案C · 品牌体系 — 禾语农产品智能商管平台前端优化样稿</title>
+<style>
+/* ════════════════════════════════════════════════════════════════════
+   方案 C：品牌体系（B 的全部 + 品牌资产层）
+   新增：横版 logo 组合、嘉禾插画（线条+绿）、空态规范、骨架屏、
+        动效体系（ease-out 三档）、页脚规范、登录门禁品牌化。
+   ════════════════════════════════════════════════════════════════════ */
+:root {
+  --primary: #2E7D32; --primary-hover: #1B5E20; --primary-deep: #174E1C;
+  --primary-soft: #E3F2E5; --primary-soft-bg: #F4FAF4; --on-primary: #fff;
+  --accent: #B8823C; --accent-hover: #96692C; --accent-soft: #F7EEDC; --accent-soft-bg: #FCF8F0;
+  --success: #2E7D32; --success-soft: #E3F2E5;
+  --warning: #B45309; --warning-soft: #FDF3E3;
+  --danger: #B42318; --danger-soft: #FDE4E2;
+  --info: #1D4ED8; --info-soft: #E3EDFA;
+  --ink-50:#F8FAFC; --ink-100:#F1F5F9; --ink-200:#E2E8F0; --ink-300:#CBD5E1; --ink-400:#94A3B8;
+  --ink-500:#64748B; --ink-600:#475569; --ink-700:#334155; --ink-800:#1E293B; --ink-900:#0F172A;
+  --surface:#fff; --surface-raised:#F7F9F6; --surface-hover:#EDF4ED;
+  --border:#E2E8F0; --border-light:#EEF2F6; --border-strong:#CBD5E1;
+  --text-primary:#0F172A; --text-secondary:#334155; --text-muted:#5B6B7C;
+  --r-xs:4px; --r-sm:8px; --r-md:10px; --r-lg:16px; --r-xl:22px; --r-full:9999px;
+  --sh-sm:0 1px 2px rgba(15,23,42,.05); --sh-md:0 4px 14px rgba(15,23,42,.08); --sh-lg:0 14px 36px rgba(15,23,42,.13);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --shell-h:60px;
+  --focus:0 0 0 3px var(--primary-soft);
+  /* 动效体系（C 版新增） */
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --dur-fast:120ms; --dur-base:220ms; --dur-slow:360ms;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--surface-raised);color:var(--text-primary);font-size:14px;line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+ul{list-style:none}
+
+/* ── 样稿外框 ─────────────────────────────────────────────────────── */
+.demo-bar{position:sticky;top:0;z-index:300;display:flex;align-items:center;gap:10px;height:52px;padding:0 20px;background:var(--ink-900);color:#fff}
+.demo-bar b{font-size:14px}
+.demo-bar .tag{font-size:11px;padding:2px 9px;border-radius:var(--r-full);background:var(--primary);font-weight:700}
+.demo-bar .note{font-size:12px;color:var(--ink-400);margin-left:auto}
+.demo-tabs{position:sticky;top:52px;z-index:299;display:flex;gap:2px;padding:8px 20px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto}
+.demo-tabs button{height:34px;padding:0 14px;border:none;border-radius:var(--r-md);background:transparent;color:var(--text-secondary);font-size:13px;font-weight:600;white-space:nowrap;transition:all var(--dur-fast) var(--ease-out)}
+.demo-tabs button.is-active{background:var(--primary-soft);color:var(--primary-hover)}
+.sample{display:none}
+.sample.is-active{display:block;animation:viewIn var(--dur-base) var(--ease-out)}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ══ 统一禾语农产品壳 ══ */
+.jh-shell{position:sticky;top:0;z-index:200;height:var(--shell-h);display:flex;align-items:center;gap:14px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border)}
+.jh-brand{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.jh-brand-name{font-size:16px;font-weight:800;letter-spacing:.5px}
+.jh-sys{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:var(--r-full);background:var(--primary-soft);color:var(--primary-hover);font-size:13px;font-weight:700}
+.jh-sys--blue{background:var(--accent-soft);color:var(--accent-hover)}
+.jh-back{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--primary);text-decoration:none;white-space:nowrap;transition:color var(--dur-fast)}
+.jh-back:hover{color:var(--primary-hover)}
+
+/* ══ 页头 ══ */
+.page-head{padding:22px 24px 0;max-width:1200px;margin:0 auto}
+.crumb{display:flex;gap:6px;font-size:12px;color:var(--text-muted);margin-bottom:6px}
+.crumb .sep{color:var(--ink-300)}
+.page-title{font-size:20px;font-weight:800}
+.page-sub{font-size:13px;color:var(--text-muted);margin-top:2px}
+
+/* ══ 组件规格（含 C 版动效）═══════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 16px;border:1px solid var(--border-strong);border-radius:var(--r-md);background:var(--surface);color:var(--text-primary);font-size:14px;font-weight:600;transition:all var(--dur-fast) var(--ease-out)}
+.btn:hover{background:var(--surface-hover);transform:translateY(-1px)}
+.btn--primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary);box-shadow:var(--sh-sm)}
+.btn--primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);box-shadow:var(--sh-md)}
+.btn--sm{min-height:30px;padding:0 12px;font-size:13px}
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:var(--r-full);font-size:13px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.badge--ok{background:var(--success-soft);color:var(--success)}
+.badge--warn{background:var(--warning-soft);color:var(--warning)}
+.badge--muted{background:var(--surface-hover);color:var(--text-muted);border-color:var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);transition:box-shadow var(--dur-base) var(--ease-out),border-color var(--dur-base) var(--ease-out)}
+.card--hover:hover{box-shadow:var(--sh-md);border-color:var(--border-strong);transform:translateY(-2px)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border-light)}
+.card-head b{font-size:14px}
+.card-body{padding:18px}
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th{text-align:left;padding:9px 18px;font-size:13px;color:var(--text-muted);background:var(--surface-raised);border-bottom:1px solid var(--border)}
+.table td{padding:11px 18px;border-bottom:1px solid var(--border-light);transition:background var(--dur-fast)}
+.table tbody tr:hover td{background:var(--primary-soft-bg)}
+
+/* ══ 品牌插画（C 版新增）═══════════════════════════════════════════ */
+.illus{display:block;margin:0 auto}
+.illus-line{stroke:var(--primary);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.illus-grain{fill:var(--accent)}
+
+/* ══ 空态规范（C 版新增）═══════════════════════════════════════════ */
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:36px 16px;text-align:center}
+.empty__title{font-size:15px;font-weight:700}
+.empty__desc{font-size:13px;color:var(--text-muted);max-width:360px}
+
+/* ══ 骨架屏（C 版新增）═════════════════════════════════════════════ */
+.skel{display:flex;flex-direction:column;gap:10px}
+.skel__row{height:72px;border-radius:var(--r-md);background:linear-gradient(90deg,var(--surface-hover) 25%,var(--surface) 50%,var(--surface-hover) 75%);background-size:200% 100%;animation:shimmer 1.4s var(--ease-out) infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* ══ 门户 ══ */
+.portal{padding:36px 24px 40px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.hero{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.hero__illus-wrap{position:relative}
+.hero h1{font-size:32px;font-weight:800;letter-spacing:1px}
+.hero .slogan{font-size:17px;font-weight:700;color:var(--primary);letter-spacing:3px}
+.hero p{font-size:16px;color:var(--text-secondary);max-width:760px}
+.hero__cta{display:flex;gap:10px;margin-top:6px}
+.sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.sys{padding:22px;display:flex;flex-direction:column;gap:14px}
+.sys-head{display:flex;align-items:center;justify-content:space-between}
+.sys-name{font-size:21px;font-weight:800}
+.sys-desc{font-size:15px;color:var(--text-secondary);line-height:1.7;flex:1}
+.sys-meta{border-top:1px dashed var(--border);padding-top:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.sys-row{display:flex;gap:10px}
+.sys-key{color:var(--text-muted);width:68px;flex-shrink:0}
+.sys-val code{font-family:Consolas,monospace;font-size:13px;color:var(--primary-hover)}
+.sys-tags{display:flex;flex-wrap:wrap;gap:7px}
+.sys-tag{padding:2px 10px;border-radius:var(--r-full);background:var(--surface-hover);font-size:13px;color:var(--text-muted)}
+.enter{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border-radius:var(--r-md);background:var(--primary);color:var(--on-primary);font-size:16px;font-weight:700;text-decoration:none;border:none;width:100%;transition:all var(--dur-fast) var(--ease-out)}
+.enter:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--sh-md)}
+@media(max-width:1023px){.sys-grid{grid-template-columns:1fr}}
+
+/* ══ 页脚规范（C 版新增）═══════════════════════════════════════════ */
+.site-foot{border-top:1px solid var(--border);padding:22px 24px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface)}
+.site-foot b{color:var(--text-secondary)}
+
+/* ══ 客服（骨架屏 + 空态演示）═════════════════════════════════════ */
+.cs-wrap{max-width:1200px;margin:0 auto;padding:18px 24px 32px}
+.cs-grid{display:grid;grid-template-columns:280px minmax(0,1fr) 320px;gap:16px;height:540px}
+.cs-card{overflow:hidden;display:flex;flex-direction:column}
+.cs-avatar{gap:12px;padding:16px}
+.cs-stage{aspect-ratio:9/16;max-height:280px;border:1px solid var(--border);border-radius:var(--r-md);background:radial-gradient(120% 80% at 50% 0%,var(--primary-soft-bg),transparent 62%),var(--surface-raised);display:grid;place-items:center;text-align:center}
+.cs-chat-head{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-light)}
+.cs-chat-avatar{width:38px;height:38px;border-radius:var(--r-full);background:var(--primary-soft);color:var(--primary-hover);display:grid;place-items:center;font-weight:700}
+.cs-chat-who h2{font-size:15px}
+.cs-chat-who p{font-size:13px;color:var(--text-muted)}
+.cs-chat-who .online{color:var(--success);font-weight:700}
+.cs-stream{flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--surface-raised)}
+.cs-msg{display:flex;gap:10px;max-width:82%;animation:msgIn var(--dur-base) var(--ease-out)}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.cs-msg.out{align-self:flex-end;flex-direction:row-reverse}
+.cs-msg-av{flex-shrink:0;width:30px;height:30px;border-radius:var(--r-full);display:grid;place-items:center;font-size:12px;font-weight:700}
+.cs-msg.in .cs-msg-av{background:var(--primary-soft);color:var(--primary-hover)}
+.cs-msg.out .cs-msg-av{background:var(--accent-soft);color:var(--accent-hover)}
+.cs-bubble{padding:9px 13px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--border);font-size:15px;box-shadow:var(--sh-sm)}
+.cs-msg.in .cs-bubble{border-top-left-radius:var(--r-xs)}
+.cs-msg.out .cs-bubble{background:var(--primary-soft);border-color:var(--primary-soft);border-top-right-radius:var(--r-xs)}
+.cs-track{display:inline-block;margin-right:6px;padding:0 6px;border-radius:var(--r-xs);font-size:12px;font-weight:700;vertical-align:1px}
+.cs-track--kb{background:var(--accent-soft);color:var(--accent-hover)}
+.cs-composer{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--border-light)}
+.cs-composer input{flex:1;min-width:0;height:38px;padding:0 14px;border:1px solid var(--border-strong);border-radius:var(--r-md);font-size:15px}
+.cs-composer input:focus{outline:none;border-color:var(--primary);box-shadow:var(--focus)}
+.cs-side-tabs{display:flex;gap:6px;padding:12px 14px 0}
+.cs-side-tabs button{flex:1;height:30px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);font-size:13px;font-weight:600;color:var(--text-secondary);transition:all var(--dur-fast)}
+.cs-side-tabs button.is-active{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.cs-objs{padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.cs-obj{border:1px solid var(--border-light);border-radius:var(--r-md);padding:10px 12px;background:var(--surface-raised);display:flex;flex-direction:column;gap:7px;transition:border-color var(--dur-fast)}
+.cs-obj:hover{border-color:var(--primary)}
+.cs-obj-title{font-size:13px;font-weight:700}
+.cs-obj-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)}
+.cs-obj-row b{color:var(--text-primary)}
+@media(max-width:1179px){.cs-grid{grid-template-columns:1fr;height:auto}}
+
+/* ══ 运营 ══ */
+.op-wrap{max-width:1200px;margin:0 auto;padding:18px 24px 32px}
+.op-body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:16px;align-items:start}
+.op-aside{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);padding:14px 10px;position:sticky;top:calc(var(--shell-h) + 18px)}
+.op-aside-brand{display:flex;align-items:center;gap:9px;padding:2px 8px 12px;font-size:15px;font-weight:800;border-bottom:1px solid var(--border-light);margin-bottom:8px}
+.op-group{font-size:12px;color:var(--text-muted);padding:10px 8px 4px;font-weight:700;letter-spacing:1px}
+.op-item{display:flex;align-items:center;gap:9px;height:36px;padding:0 10px;border-radius:var(--r-sm);font-size:14px;color:var(--text-secondary);border:none;background:transparent;width:100%;text-align:left;transition:all var(--dur-fast)}
+.op-item:hover{background:var(--surface-hover);color:var(--text-primary)}
+.op-item.is-active{background:var(--primary-soft);color:var(--primary-hover);font-weight:600}
+.op-item .ic{width:8px;height:8px;border-radius:3px;background:var(--accent);transition:background var(--dur-fast)}
+.op-item.is-active .ic{background:var(--primary)}
+.op-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.op-kpi{padding:16px 18px}
+.op-kpi .label{font-size:13px;color:var(--text-muted)}
+.op-kpi .value{font-size:26px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+@media(max-width:1023px){.op-body{grid-template-columns:1fr}.op-aside{position:static;display:flex;flex-wrap:wrap;gap:4px}.op-aside-brand{width:100%}.op-group{display:none}.op-kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* ══ 智库登录门禁（C 版品牌化）═════════════════════════════════════ */
+.kb-login{min-height:520px;display:grid;place-items:center;padding:24px;position:relative;overflow:hidden}
+.kb-login__bg{position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 0%,var(--primary-soft) 0%,transparent 60%),radial-gradient(60% 50% at 80% 100%,var(--accent-soft) 0%,transparent 55%),var(--surface-raised)}
+.kb-login__card{position:relative;width:min(400px,92%);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--sh-lg);padding:32px 28px;display:flex;flex-direction:column;gap:16px;animation:viewIn var(--dur-slow) var(--ease-out)}
+.kb-login__head{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.kb-login__head h1{font-size:22px;font-weight:800}
+.kb-login__head p{font-size:14px;color:var(--text-muted)}
+.kb-field{display:flex;flex-direction:column;gap:5px}
+.kb-field label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.kb-field input{height:40px;padding:0 14px;border:1px solid var(--border-strong);border-radius:var(--r-md);font-size:15px}
+.kb-field input:focus{outline:none;border-color:var(--primary);box-shadow:var(--focus)}
+.kb-login .enter{min-height:44px}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <b>方案 C · 品牌体系</b><span class="tag">完整品牌化</span>
+  <span class="note">B 全部 + 插画/空态/骨架屏/动效/横版 logo/页脚/登录品牌化 · 样稿非真实页面</span>
+</div>
+<div class="demo-tabs" role="tablist">
+  <button class="is-active" data-tab="portal">平台门户</button>
+  <button data-tab="cs">禾语农产品AI客服</button>
+  <button data-tab="op">禾语农产品AI运营助手</button>
+  <button data-tab="kb">禾语农产品知识库</button>
+</div>
+
+<!-- ═══ 样片 1：门户（插画 hero + 横版 logo）═══════════════════════ -->
+<div class="sample is-active" id="s-portal">
+  <div class="jh-shell">
+    <div class="jh-brand">
+      <svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gc" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#66BB6A"/><stop offset="1" stop-color="#2E7D32"/></linearGradient></defs><circle cx="24" cy="24" r="21" stroke="url(#gc)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 12 33 19H15l9-7z" fill="#96692C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/><circle cx="24" cy="21" r="2" fill="#B8823C"/></svg>
+      <span class="jh-brand-name">禾语农产品智能商管平台</span>
+    </div>
+    <a class="jh-back" href="#">当前：平台门户</a>
+  </div>
+  <div class="portal">
+    <div class="hero">
+      <div class="hero__illus-wrap">
+        <!-- 嘉禾插画：田垄 + 禾苗 + 屋宇（品牌资产，线条+嘉禾绿） -->
+        <svg class="illus" width="180" height="110" viewBox="0 0 180 110" aria-hidden="true">
+          <path class="illus-line" d="M20 96 Q60 78 90 88 T160 84"/>
+          <path class="illus-line" d="M20 104 Q70 90 90 98 T160 94" opacity=".5"/>
+          <path class="illus-line" d="M90 88V52"/>
+          <path class="illus-line" d="M90 64c-7-3-12-9-13-17 8-1 13 4 13 11 0 3-.5 5 0 6z"/>
+          <path class="illus-line" d="M90 60c7-3 12-9 13-17-8-1-13 4-13 11 0 3 .5 5 0 6z"/>
+          <circle class="illus-grain" cx="90" cy="40" r="5"/>
+          <path class="illus-line" d="M118 88V60l16-12 16 12v28z"/>
+          <path class="illus-grain" d="M134 60v-8l-4 3 4-8 4 8-4-3v8z" opacity=".9"/>
+          <path class="illus-line" d="M130 88v-14h8v14" opacity=".6"/>
+          <circle class="illus-grain" cx="46" cy="34" r="3" opacity=".7"/>
+          <circle class="illus-grain" cx="150" cy="30" r="3" opacity=".7"/>
+          <circle class="illus-grain" cx="140" cy="44" r="2.4" opacity=".5"/>
+          <circle class="illus-grain" cx="36" cy="48" r="2.4" opacity=".5"/>
+        </svg>
+      </div>
+      <h1>禾语农产品智能商管平台</h1>
+      <p class="slogan">良品进万家 · 智能理千商</p>
+      <p>一站式统筹 <b>禾语农产品AI客服</b>（售后对话）、<b>禾语农产品AI运营助手</b>（售前策略）、<b>禾语农产品知识库</b>（售中问答）。</p>
+      <div class="hero__cta">
+        <button class="btn btn--primary" style="min-height:44px;padding:0 22px">开始使用</button>
+        <button class="btn" style="min-height:44px;padding:0 22px">查看规范手册</button>
+      </div>
+    </div>
+    <div class="sys-grid">
+      <div class="card card--hover sys">
+        <div class="sys-head"><span class="sys-name">禾语农产品AI客服</span><span class="badge badge--ok">后端在线</span></div>
+        <p class="sys-desc">电商小二对话引擎：任务 / 知识 / 闲聊三轨分流，数字人语音播报。</p>
+        <div class="sys-meta"><div class="sys-row"><span class="sys-key">原有前端</span><span class="sys-val"><code>:5173</code></span></div></div>
+        <div class="sys-tags"><span class="sys-tag">FastAPI</span><span class="sys-tag">Vue 3</span></div>
+        <button class="enter">进入系统 →</button>
+      </div>
+      <div class="card card--hover sys">
+        <div class="sys-head"><span class="sys-name">禾语农产品AI运营助手</span><span class="badge badge--ok">后端在线</span></div>
+        <p class="sys-desc">多 Agent 商品运营管线：诊断 → 创意策略 → 质量审查 → 人工审批。</p>
+        <div class="sys-meta"><div class="sys-row"><span class="sys-key">原有前端</span><span class="sys-val"><code>:3000</code></span></div></div>
+        <div class="sys-tags"><span class="sys-tag">FastAPI</span><span class="sys-tag">Next.js</span></div>
+        <button class="enter">进入系统 →</button>
+      </div>
+      <div class="card card--hover sys">
+        <div class="sys-head"><span class="sys-name">禾语农产品知识库</span><span class="badge badge--ok">后端在线</span></div>
+        <p class="sys-desc">产品手册 RAG：三路召回 + RRF 融合 + 重排的问答体验。</p>
+        <div class="sys-meta"><div class="sys-row"><span class="sys-key">原有前端</span><span class="sys-val"><code>/tianshe/</code></span></div></div>
+        <div class="sys-tags"><span class="sys-tag">LangGraph</span><span class="sys-tag">Milvus</span></div>
+        <button class="enter">进入系统 →</button>
+      </div>
+    </div>
+  </div>
+  <footer class="site-foot"><b>禾语农产品智能商管平台</b> v1.0.0 · 良品进万家，智能理千商 · 令牌版本 jiahe-brand-tokens@1.0.0</footer>
+</div>
+
+<!-- ═══ 样片 2：禾语农产品AI客服（骨架屏 + 空态规范）══════════════════════ -->
+<div class="sample" id="s-cs">
+  <div class="jh-shell">
+    <div class="jh-brand">
+      <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="url(#gc)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="jh-brand-name">禾语农产品智能商管平台</span>
+      <span class="jh-sys">禾语农产品AI客服</span>
+    </div>
+    <a class="jh-back" href="#">← 返回门户</a>
+  </div>
+  <div class="page-head">
+    <div class="crumb"><span>门户</span><span class="sep">/</span><span>禾语农产品AI客服</span><span class="sep">/</span><span>工作台</span></div>
+    <div class="page-title">对话工作台</div>
+    <div class="page-sub">三轨对话引擎 + 数字人播报 + 业务对象 · sender_id = u1001</div>
+  </div>
+  <div class="cs-wrap">
+    <div class="cs-grid">
+      <div class="card cs-avatar">
+        <div class="cs-stage">
+          <div class="empty">
+            <svg class="illus" width="72" height="72" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="20" class="illus-line" opacity=".35"/>
+              <path class="illus-line" d="M24 34v-8"/>
+              <path class="illus-line" d="M24 26c-5-2-8-6-9-12 6-1 9 3 9 8 0 2-.3 3 0 4z"/>
+              <path class="illus-line" d="M24 24c5-2 8-6 9-12-6-1-9 3-9 8 0 2 .3 3 0 4z"/>
+              <circle class="illus-grain" cx="24" cy="14" r="3.4"/>
+            </svg>
+            <p class="empty__title">数字人未连接</p>
+            <p class="empty__desc">点击「连接数字人」后，客服回复将自动语音播报</p>
+          </div>
+        </div>
+        <button class="btn btn--primary">连接数字人</button>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="cs-chat-head">
+          <div class="cs-chat-avatar">宝</div>
+          <div class="cs-chat-who"><h2>电商客服系统</h2><p><span class="online">● 在线</span> · u1001</p></div>
+        </div>
+        <div class="cs-stream">
+          <div class="cs-msg in"><span class="cs-msg-av">宝</span><div class="cs-bubble"><span class="cs-track cs-track--kb">知识轨</span>根据《售后政策手册》：自签收之日起 7 天内可无理由退换，15 天内质量问题换新。</div></div>
+          <div class="cs-msg out"><span class="cs-msg-av">你</span><div class="cs-bubble">好的，我知道了</div></div>
+          <div class="cs-msg in"><span class="cs-msg-av">宝</span><div class="cs-bubble">不客气！后续有任何问题随时找我～</div></div>
+        </div>
+        <div class="cs-composer"><input placeholder="请输入咨询内容…"><button class="btn btn--primary">发送</button></div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-head"><b>业务对象</b><span style="font-size:13px;color:var(--text-muted)">加载中</span></div>
+        <div class="cs-objs">
+          <!-- 骨架屏规范 -->
+          <div class="skel"><span class="skel__row"></span><span class="skel__row"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 样片 3：禾语农产品AI运营助手 ═══════════════════════════════════════════ -->
+<div class="sample" id="s-op">
+  <div class="jh-shell">
+    <div class="jh-brand">
+      <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="url(#gc)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="jh-brand-name">禾语农产品智能商管平台</span>
+      <span class="jh-sys jh-sys--blue">禾语农产品AI运营助手</span>
+    </div>
+    <a class="jh-back" href="#">← 返回门户</a>
+  </div>
+  <div class="page-head">
+    <div class="crumb"><span>门户</span><span class="sep">/</span><span>禾语农产品AI运营助手</span><span class="sep">/</span><span>工作台</span></div>
+    <div class="page-title">运营工作台</div>
+    <div class="page-sub">商品诊断 · 策略生成 · 人工审批</div>
+  </div>
+  <div class="op-wrap">
+    <div class="op-body">
+      <aside class="op-aside">
+        <div class="op-aside-brand">
+          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="#2E7D32" stroke-width="4" fill="none"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/></svg>
+          禾语农产品AI运营助手
+        </div>
+        <div class="op-group">运营</div>
+        <button class="op-item is-active"><span class="ic"></span>工作台</button>
+        <button class="op-item"><span class="ic"></span>商品趋势</button>
+        <button class="op-item"><span class="ic"></span>数据导入</button>
+        <div class="op-group">增长</div>
+        <button class="op-item"><span class="ic"></span>AI Agent</button>
+        <div class="op-group">系统</div>
+        <button class="op-item"><span class="ic"></span>模型配置</button>
+      </aside>
+      <div>
+        <div class="op-kpis">
+          <div class="card card--hover op-kpi"><div class="label">在售商品</div><div class="value">126</div></div>
+          <div class="card card--hover op-kpi"><div class="label">本周运行</div><div class="value">46</div></div>
+          <div class="card card--hover op-kpi"><div class="label">待审批</div><div class="value">3</div></div>
+          <div class="card card--hover op-kpi"><div class="label">覆盖店铺</div><div class="value">8</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><b>商品列表</b><button class="btn btn--primary btn--sm">+ 新建商品</button></div>
+          <table class="table">
+            <thead><tr><th>商品</th><th>类目</th><th>价格</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>五常稻花香大米 5kg</td><td>粮油</td><td>¥89.00</td><td><span class="badge badge--ok">在售</span></td><td><button class="btn btn--sm">详情</button></td></tr>
+              <tr><td>散养土鸡蛋 30 枚</td><td>生鲜</td><td>¥45.80</td><td><span class="badge badge--ok">在售</span></td><td><button class="btn btn--sm">详情</button></td></tr>
+              <tr><td>高山有机绿茶 250g</td><td>茶饮</td><td>¥128.00</td><td><span class="badge badge--warn">待审批</span></td><td><button class="btn btn--sm">详情</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-foot"><b>禾语农产品智能商管平台</b> · 禾语农产品AI运营助手 · 令牌版本 jiahe-brand-tokens@1.0.0</footer>
+</div>
+
+<!-- ═══ 样片 4：禾语农产品知识库（登录门禁品牌化）══════════════════════════ -->
+<div class="sample" id="s-kb">
+  <div class="jh-shell">
+    <div class="jh-brand">
+      <svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="url(#gc)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="jh-brand-name">禾语农产品智能商管平台</span>
+      <span class="jh-sys">禾语农产品知识库</span>
+    </div>
+    <a class="jh-back" href="#">← 返回门户</a>
+  </div>
+  <div class="kb-login">
+    <div class="kb-login__bg" aria-hidden="true"></div>
+    <div class="kb-login__card">
+      <div class="kb-login__head">
+        <svg width="56" height="56" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="url(#gc)" stroke-width="4" fill="#F4FAF4"/><path d="M24 12 33 19v13H15V19l9-7z" fill="#B8823C"/><path d="M24 12 33 19H15l9-7z" fill="#96692C"/><path d="M24 40V26" stroke="#2E7D32" stroke-width="2.6" stroke-linecap="round"/><circle cx="24" cy="21" r="2" fill="#B8823C"/></svg>
+        <h1>禾语农产品知识库</h1>
+        <p>登录后开始对话检索 · 禾语农产品智能商管平台</p>
+      </div>
+      <div class="kb-field"><label for="kb-user">账号</label><input id="kb-user" type="text" placeholder="admin" autocomplete="off"></div>
+      <div class="kb-field"><label for="kb-pass">密码</label><input id="kb-pass" type="password" placeholder="••••••••"></div>
+      <button class="enter" type="button">登 录</button>
+      <p style="font-size:12px;color:var(--text-muted);text-align:center">登录状态由本地校验，与后端会话体系打通</p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.demo-tabs button').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.demo-tabs button').forEach(function (b) { b.classList.toggle('is-active', b === btn) })
+    document.querySelectorAll('.sample').forEach(function (s) { s.classList.remove('is-active') })
+    document.getElementById('s-' + btn.dataset.tab).classList.add('is-active')
+  })
+})
+</script>
+</body>
+</html>

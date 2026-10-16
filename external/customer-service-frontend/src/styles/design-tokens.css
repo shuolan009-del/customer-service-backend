@@ -1,62 +1,42 @@
 /* ============================================================================
-   Design Tokens —— 电商小二客服系统
-   唯一主色 teal #0F766E · ink 中性阶 · 4px 间距全阶 · 真阶梯圆角 / 阴影
-   本文件为全局唯一令牌来源；组件内一律通过 var() 引用，不得再写死色值。
+   Design Tokens —— AI客服助手（嘉禾品牌版）
+   ----------------------------------------------------------------------------
+   配色/圆角/阴影/动效全部来自品牌令牌包 jiahe-brand-tokens@1.0.0
+   （与本文件同目录，由 scripts/sync-brand-tokens.py 同步，勿单独修改）。
+   本项目组件沿用 --color-* 命名，通过下方「别名映射段」对接品牌令牌，
+   实现零组件改动换肤；本文件只保留客服特有阶梯（字号/间距/工作台栅格/层级）。
    ============================================================================ */
+@import './jiahe-brand-tokens.css';
 
 :root {
-  /* ── 主色（唯一）—— 墨绿 / 靛青 teal ───────────────────────────────── */
-  --color-primary: #0F766E;          /* 主按钮 / 激活 Tab / Turn 徽章 / 用户气泡 / 焦点环 / 链接；白底 5.48:1 AA */
-  --color-primary-hover: #0B5D57;    /* hover */
-  --color-primary-active: #094C47;   /* pressed */
-  --color-primary-soft: rgba(15, 118, 110, 0.10);   /* 浅底：chip、图标按钮 hover */
-  --color-primary-soft-bg: rgba(15, 118, 110, 0.06);/* 极浅底 */
-  --color-on-primary: #FFFFFF;       /* 主色底上的前景 */
-
-  /* ── 中性阶 ink（10 档）───────────────────────────────────────────── */
-  --ink-50: #F8FAFC;
-  --ink-100: #F1F5F9;
-  --ink-200: #E5E9F0;
-  --ink-300: #CBD5E1;
-  --ink-400: #94A3B8;
-  --ink-500: #6B7280;
-  --ink-600: #4B5563;
-  --ink-700: #334155;
-  --ink-800: #1F2937;
-  --ink-900: #1F2329;
-
-  /* ── 语义色（与主色必须明确区分；danger 独立于主色）──────────────── */
-  --color-success: #2E7D32;
-  --color-success-soft: rgba(46, 125, 50, 0.10);
-  --color-warning: #B7791F;
-  --color-warning-soft: rgba(183, 121, 31, 0.10);
-  --color-danger: #B42318;
-  --color-danger-soft: rgba(180, 35, 24, 0.10);
-  --color-info: #3B6E9E;
-  --color-info-soft: rgba(59, 110, 158, 0.10);
-
-  /* ── 文字 ─────────────────────────────────────────────────────────── */
-  --color-text-primary: var(--ink-900);
-  --color-text-secondary: var(--ink-600);
-  --color-text-muted: var(--ink-500);
+  /* ── 品牌别名映射（本项目命名 → 品牌令牌）────────────────────────── */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-bg: var(--primary-soft-bg);
+  --color-on-primary: var(--on-primary);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --color-text-inverse: #FFFFFF;
+  --focus-ring: var(--focus);
+  --focus-ring-danger: 0 0 0 3px var(--danger-soft);
 
-  /* ── 表面 ─────────────────────────────────────────────────────────── */
-  --surface: #FFFFFF;
-  --surface-raised: #F8FAFC;
-  --surface-field: #FFFFFF;
-  --surface-hover: #F1F5F9;
-
-  /* ── 边框 / 焦点环 ────────────────────────────────────────────────── */
-  --border: rgba(31, 35, 41, 0.12);
-  --border-light: rgba(31, 35, 41, 0.06);
-  --border-strong: rgba(31, 35, 41, 0.20);
-  --focus-ring: 0 0 0 3px rgba(15, 118, 110, 0.30);
-  --focus-ring-danger: 0 0 0 3px rgba(180, 35, 24, 0.28);
+  /* ── 补足档（品牌包三档阴影之外的第四档）────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, .04);
 
   /* ── 字体 ─────────────────────────────────────────────────────────── */
-  --font-sans: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  --font-sans: var(--font);
+  --font-mono: var(--font-mono);
 
   /* ── 字号（px + rem 对照）─────────────────────────────────────────── */
   --text-xs: 12px;    /* .75rem  徽章、辅助 */
@@ -87,30 +67,8 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* ── 圆角（真阶梯，非「全 8px」假令牌）────────────────────────────── */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;   /* 主用 */
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px; /* 徽章 / chip / 状态点 / 圆形头像 */
-
-  /* ── 阴影（4 档真阶梯）────────────────────────────────────────────── */
-  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
-  --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
-  --shadow-lg: 0 12px 24px -6px rgba(16, 24, 40, 0.10), 0 4px 8px -4px rgba(16, 24, 40, 0.06);
-
-  /* ── 动效 ─────────────────────────────────────────────────────────── */
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  --duration-slow: 320ms;
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* ── 工作台栅格 ───────────────────────────────────────────────────── */
-  --shell-h: 56px;      /* 顶栏高度（工作台/管理端共用） */
+  /* ── 工作台栅格（客服特有）───────────────────────────────────────── */
+  --shell-h: 60px;      /* 顶栏高度（与禾语农产品平台统一） */
   --wb-left: 320px;
   --wb-right: 370px;
   --wb-gap: 22px;
@@ -124,12 +82,39 @@
   --z-drawer: 200;
   --z-toast: 300;
   --z-dialog: 400;
+
+  /* ── 聊天柔和化令牌（2026-10-13 新增，仅工作台对话区使用）─────────────
+     思路：不动品牌绿主色（保持 logo 取色与品牌断言），
+     用「暖白气泡底 + 大圆角 + 弥散柔影 + 浅绿描边 + 放宽同组间距」降噪。 */
+  --bubble-r: 18px;            /* 气泡主圆角（比 r-lg 16px 更柔一圈） */
+  --bubble-r-tail: 8px;        /* 折角圆角（比 r-xs 4px 去掉尖锐感） */
+  --bubble-in-bg: #F6F9F5;     /* 来息气泡底：极浅绿灰暖白，降低纯白对比 */
+  --bubble-in-border: #E3EDE3; /* 来息气泡描边：同色系浅边 */
+  --bubble-shadow: 0 1px 2px rgba(15, 23, 42, .03), 0 6px 16px rgba(15, 23, 42, .05);
+  --bubble-group-gap: 6px;     /* 同组气泡间距（原 4px，放宽更透气） */
+
+  /* ── 组件别名补齐（2026-10-16 修复）─────────────────────────────────
+     品牌包 v1.0.0 的令牌是缩写命名（--r-* / --sh-* / --dur-*），
+     而组件层引用的是 --radius-* / --shadow-* / --duration-*，二者从未接通
+     → 线上圆角 / 阴影 / 过渡整体失效（99 处引用全部回落，界面渲染为直角）。
+     此处一次性补齐映射（改一处，全站圆角+阴影+动效即恢复设计预期）。
+     注：若品牌包日后恢复全名令牌，可直接删除本段。 */
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-full: var(--r-full);
+  --shadow-sm: var(--sh-sm);
+  --shadow-md: var(--sh-md);
+  --shadow-lg: var(--sh-lg);
+  --duration-fast: var(--dur-fast);
+  --duration-base: var(--dur-base);
+  --duration-slow: var(--dur-slow);
 }
 
 /* ----------------------------------------------------------------------------
-   Legacy 兼容别名层已于本轮删除。
-   删除前提：全仓「--color-surface / --color-border / --color-surface-hover /
-   --color-bg-* / --ease-out-expo」引用已清零（含 WorkbenchView 的 81 处、
-   components/ui 的 8 处），可用 scripts/check-frontend-tokens.py 复核。
-   如需临时回退，见 git 历史里的上一版 design-tokens.css。
+   说明：ink 中性阶 / 表面 / 边框 / 圆角 / 阴影三档 / 动效均由品牌令牌包提供
+   （--ink-* / --surface* / --border* / --radius-* / --shadow-sm|md|lg /
+    --duration-* / --ease-*），本文件不重复定义，保证三项目同源同值。
    ---------------------------------------------------------------------------- */
