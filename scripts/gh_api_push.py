@@ -111,15 +111,21 @@ def to_iso(epoch, tz):
 def ensure_repo_initialized(repo, branch="main"):
     """空仓库直接建 blob 会 409（Git Repository is empty）。
     先用 Contents API 放占位 README 生成初始提交，随后本脚本会把自己的提交
-    force 到分支上，占位提交成为不可达对象，不出现在分支历史里。"""
+    force 到分支上，占位提交成为不可达对象，不出现在分支历史里。
+
+    返回 True 表示本次调用刚创建了占位提交（调用方应忽略远端当前 HEAD）。
+    """
     try:
         api("GET", f"/repos/{OWNER}/{repo}/git/refs/heads/{branch}",
             no_retry_codes=(404, 409))
-        return
+        return False
     except RuntimeError as e:
         # 404 = 分支不存在；409 = Git Repository is empty。两者都表示仓库为空，需初始化
         if "404" not in str(e) and "409" not in str(e):
             raise
+    except KeyError:
+        # 极端情况下 ref 响应缺 object 字段，同样按空仓库处理
+        pass
     readme = base64.b64encode(
         f"# {repo}\n\n(placeholder - real content follows in commit history)\n"
         .encode("utf-8")).decode("ascii")
@@ -129,6 +135,7 @@ def ensure_repo_initialized(repo, branch="main"):
         "branch": branch,
     })
     print("    [init] 空仓库已用占位 README 初始化（后续被真实提交替换）")
+    return True
 
 
 def upload_blobs(repo, workdir, sha_content_pairs):
@@ -159,17 +166,51 @@ def upload_blobs(repo, workdir, sha_content_pairs):
     return failed
 
 
+def is_placeholder_commit(repo, sha, branch="main"):
+    """判断远端 HEAD 是否为本脚本创建的占位提交。
+
+    场景：本次调用（或上一次失败重试）刚用 Contents API 放了占位 README，
+    该提交不在本地历史里，会被防强推保护误拦。此处核实它确实只是占位符
+    （提交信息匹配 + 仅含 README.md + 内容为占位文本），是则可安全覆盖。
+    """
+    try:
+        # 注意两点：① 必须用完整 40 位 SHA（短 SHA 此端点返回 404）；
+        #         ② /repos/{}/{}/commits/{sha} 才带 files 字段，/git/commits/{sha} 不带
+        full = api("GET", f"/repos/{OWNER}/{repo}/commits/{sha}")
+        if full.get("commit", {}).get("message", "").strip() != "chore: initialize repository":
+            return False
+        if [f["filename"] for f in (full.get("files") or [])] != ["README.md"]:
+            return False
+    except RuntimeError:
+        return False
+    try:
+        blob = api("GET", f"/repos/{OWNER}/{repo}/contents/README.md?ref={branch}")
+        text = base64.b64decode(blob["content"]).decode("utf-8", "replace")
+    except RuntimeError:
+        return False
+    return "placeholder - real content follows in commit history" in text
+
+
 def push_repo(repo, workdir, branch="main"):
     print(f"==> {repo}  (workdir={workdir}, branch={branch})")
     print(f"    proxies: {urllib.request.getproxies()}")
     t0 = time.time()
-    ensure_repo_initialized(repo, branch)
+    just_initialized = ensure_repo_initialized(repo, branch)
 
     # 远端当前 HEAD：增量推送的依据 + 防强推保护
-    try:
-        remote_sha = api("GET", f"/repos/{OWNER}/{repo}/git/refs/heads/{branch}")["object"]["sha"]
-    except RuntimeError:
+    if just_initialized:
+        # 刚放的占位提交不在本地历史里，属预期情况——按全量推送处理，
+        # 末尾会把分支 force 到本地 HEAD，占位提交成为不可达对象
+        print("    远端 HEAD 为本次创建的占位提交，按全量推送处理")
         remote_sha = None
+    else:
+        try:
+            remote_sha = api("GET", f"/repos/{OWNER}/{repo}/git/refs/heads/{branch}")["object"]["sha"]
+        except RuntimeError:
+            remote_sha = None
+        if remote_sha and is_placeholder_commit(repo, remote_sha, branch):
+            print("    远端 HEAD 是占位提交（上次初始化残留），按全量推送处理")
+            remote_sha = None
 
     commits = git(workdir, "rev-list", "--reverse", "--topo-order", branch).split()
     if remote_sha:
