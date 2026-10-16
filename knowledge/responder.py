@@ -1,4 +1,4 @@
-# itwwy/knowledge/responder.py
+# 小禾/knowledge/responder.py
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser

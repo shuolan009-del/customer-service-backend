@@ -1,4 +1,4 @@
-# itwwy/models/dialogue_state.py
+# 小禾/models/dialogue_state.py
 
 from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column

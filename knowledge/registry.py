@@ -1,4 +1,4 @@
-# itwwy/knowledge/registry.py
+# 小禾/knowledge/registry.py
 
 from knowledge.providers import KnowledgeProvider, ProductAPIProvider, OrderAPIProvider, FAQProvider, RAGProvider
 

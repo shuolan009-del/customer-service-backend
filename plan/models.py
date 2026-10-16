@@ -1,4 +1,4 @@
-# itwwy/plan/models.py
+# 小禾/plan/models.py
 import json
 from task.command.models import Command
 from pydantic import BaseModel

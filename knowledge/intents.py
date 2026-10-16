@@ -1,4 +1,4 @@
-# itwwy/knowledge/intents.py
+# 小禾/knowledge/intents.py
 
 from pydantic import BaseModel
 

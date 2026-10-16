@@ -28,7 +28,7 @@ openapi_tags = [
 app = FastAPI(
     title="ITWWY 电商业务服务",
     version="0.1.0",
-    description="为 itwwy 客服项目提供订单、物流、商品与订单操作能力的示例电商服务。",
+    description="为 小禾 客服项目提供订单、物流、商品与订单操作能力的示例电商服务。",
     openapi_tags=openapi_tags,
 )
 

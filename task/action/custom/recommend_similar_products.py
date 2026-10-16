@@ -1,4 +1,4 @@
-# itwwy/task/action/custom/recommend_similar_products.py
+# 小禾/task/action/custom/recommend_similar_products.py
 from typing import Any
 
 from domain.messages import BotMessage

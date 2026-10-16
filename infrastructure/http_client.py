@@ -1,4 +1,4 @@
-# itwwy/infrastructure/http_client.py
+# 小禾/infrastructure/http_client.py
 """
 httpx 和 requests 是同一类东西——都是 Python 的 HTTP 客户端库，干一样的活：发 GET/POST、带请求头、传参数、处理响应。你平时怎么用 requests，httpx 基本就怎么用，它的 API 就是照着 requests 设计的，httpx.get()、r.json() 这些写法几乎可以无缝互换
 """

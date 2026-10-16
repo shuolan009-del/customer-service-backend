@@ -1,4 +1,4 @@
-# itwwy/knowledge/providers.py
+# 小禾/knowledge/providers.py
 
 import json, asyncio
 from abc import ABC, abstractmethod
@@ -41,11 +41,11 @@ class ProductAPIProvider(KnowledgeProvider):
         url = f"{settings.commerce_api_base_url}/products/{product_id}"
         # http://127.0.0.1:18081/products/123456
         # 注意此处：
-        # 文件头部 from itwwy.infrastructure import http_client
+        # 文件头部 from 小禾.infrastructure import http_client
         # 此处使用 http_client.http_client.get(url) 调用
 
         # 不要这样做：
-        # 文件头部 from itwwy.infrastructure.http_client import http_client
+        # 文件头部 from 小禾.infrastructure.http_client import http_client
         # 此处使用 http_client.get(url) 调用
         # 会使拿到的 http_client 是 None
         response = await http_client.http_client.get(url)

@@ -1,4 +1,4 @@
-# itwwy/conf/config.py
+# 小禾/conf/config.py
 import os
 from pathlib import Path
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     a = int(os.getenv("APP_PORT")) # int
     print(type(a)) # int   NoneType
-    # from itwwy.conf.config import settings
+    # from 小禾.conf.config import settings
     # 自动为我们做了 类型转换
     print(type(settings.database_url))
 

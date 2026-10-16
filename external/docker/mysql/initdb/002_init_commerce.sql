@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS `commerce`
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
-GRANT ALL PRIVILEGES ON `commerce`.* TO 'itwwy'@'%';
+GRANT ALL PRIVILEGES ON `commerce`.* TO '小禾'@'%';
 FLUSH PRIVILEGES;
 
 USE `commerce`;

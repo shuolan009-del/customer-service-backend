@@ -264,9 +264,9 @@ button.primary:hover{filter:brightness(1.15)}
                 <span class="st st-crash">⛔ crash → 自动重启</span>
               </div>
               <div class="envs">
-                <div class="env-badge e1">MYSQL_ROOT_PASSWORD=itwwy123@</div>
-                <div class="env-badge e2">MYSQL_USER=itwwy</div>
-                <div class="env-badge e3">MYSQL_PASSWORD=itwwy123@</div>
+                <div class="env-badge e1">MYSQL_ROOT_PASSWORD=小禾123@</div>
+                <div class="env-badge e2">MYSQL_USER=小禾</div>
+                <div class="env-badge e3">MYSQL_PASSWORD=小禾123@</div>
               </div>
             </div>
             <div class="cright">
@@ -327,7 +327,7 @@ button.primary:hover{filter:brightness(1.15)}
 <!-- ========== 底部要点卡片 ========== -->
 <div class="cards">
   <div class="mini"><div class="mi">🔌</div><div class="mt">端口映射</div><div class="ms">ports: "3306:3306"</div><div class="md">宿主机 3306 ↔ 容器 3306，App 用 localhost:3306 直连，无需进入容器</div></div>
-  <div class="mini"><div class="mi">🔑</div><div class="mt">账号自动注入</div><div class="ms">environment</div><div class="md">首次启动自动初始化 root 密码与 itwwy 账号，随容器一起创建</div></div>
+  <div class="mini"><div class="mi">🔑</div><div class="mt">账号自动注入</div><div class="ms">environment</div><div class="md">首次启动自动初始化 root 密码与 小禾 账号，随容器一起创建</div></div>
   <div class="mini"><div class="mi">📦</div><div class="mt">数据持久化</div><div class="ms">mysql_data:/var/lib/mysql</div><div class="md">命名卷独立于容器生命周期，删容器、重建容器数据都不丢</div></div>
   <div class="mini"><div class="mi">🔄</div><div class="mt">自动重启</div><div class="ms">restart: unless-stopped</div><div class="md">mysqld 崩溃自动拉起；仅当手动 docker stop 时才不会重启</div></div>
 </div>
@@ -346,11 +346,11 @@ var STEPS=[
          '<span class="t-d">镜像就绪 → 等待创建容器</span>']},
   {hl:[3,5,6,7,8],
    title:'② 创建容器 · 注入环境变量',
-   desc:'容器按 container_name 命名为 customer-service-mysql；environment 中三个变量注入容器内部，MySQL 首次启动时据此初始化 root 密码与 itwwy 账号。',
+   desc:'容器按 container_name 命名为 customer-service-mysql；environment 中三个变量注入容器内部，MySQL 首次启动时据此初始化 root 密码与 小禾 账号。',
    logs:['<span class="t-ok">✔ Creating container: customer-service-mysql</span>',
-         '<span class="t-d">env → MYSQL_ROOT_PASSWORD = itwwy123@</span>',
-         '<span class="t-d">env → MYSQL_USER = itwwy</span>',
-         '<span class="t-d">env → MYSQL_PASSWORD = itwwy123@</span>',
+         '<span class="t-d">env → MYSQL_ROOT_PASSWORD = 小禾123@</span>',
+         '<span class="t-d">env → MYSQL_USER = 小禾</span>',
+         '<span class="t-d">env → MYSQL_PASSWORD = 小禾123@</span>',
          '<span class="t-i">[+] Container created · Starting ...</span>']},
   {hl:[16],
    title:'③ 首次启动 · 执行初始化脚本',
@@ -358,7 +358,7 @@ var STEPS=[
    logs:['<span class="t-i">[init] /var/lib/mysql is empty → bootstrap</span>',
          '<span class="t-i">[init] executing /docker-entrypoint-initdb.d/*.sql</span>',
          '<span class="t-ok">CREATE DATABASE ... ✔ OK</span>',
-         '<span class="t-ok">CREATE USER itwwy / GRANT ALL ... ✔ OK</span>',
+         '<span class="t-ok">CREATE USER 小禾 / GRANT ALL ... ✔ OK</span>',
          '<span class="t-i">[init] done · starting mysqld ...</span>']},
   {hl:[10,11,12,13],
    title:'④ MySQL 就绪 · 端口对外',
@@ -393,9 +393,9 @@ var YAML=[
  '    container_name: customer-service-mysql',
  '    restart: unless-stopped',
  '    environment:',
- '      MYSQL_ROOT_PASSWORD: itwwy123@',
- '      MYSQL_USER: itwwy',
- '      MYSQL_PASSWORD: itwwy123@',
+ '      MYSQL_ROOT_PASSWORD: 小禾123@',
+ '      MYSQL_USER: 小禾',
+ '      MYSQL_PASSWORD: 小禾123@',
  '    ports:',
  '      - "3306:3306"',
  '    command:',

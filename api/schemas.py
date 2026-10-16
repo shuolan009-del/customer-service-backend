@@ -1,4 +1,4 @@
-# itwwy/api/schemas.py
+# 小禾/api/schemas.py
 
 from pydantic import BaseModel
 
