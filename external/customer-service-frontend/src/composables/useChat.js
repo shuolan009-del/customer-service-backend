@@ -120,6 +120,31 @@ function setHistoryMessages(historyMessages) {
   })
 }
 
+// ── 演示兜底（2026-10-16）───────────────────────────────────────────
+/**
+ * 虚拟对话：真实历史为空或历史接口失败时展示，保证任意 sender_id 下
+ * 聊天区都有内容可看（与右侧「演示数据」同策略）。字段形状与历史接口一致。
+ * 时间戳只在内存中设置（今天、按分钟回退），不写入本地时间轴，刷新后重新生成。
+ */
+const MOCK_CHAT = [
+  { role: 'bot', text: '您好，我是小禾，您的专属电商客服。查订单、问商品、退换货，都可以直接找我。' },
+  { role: 'user', text: '我昨天下的单什么时候能发货？' },
+  { role: 'bot', text: '帮您查到订单 A20260410001 已进入打包流程，预计今天 18:00 前发出，发出后会第一时间短信通知您。', suggestions: ['帮我催发货', '修改收货地址'] },
+  { role: 'user', object: { type: 'order', order_id: 'A20260410001', title: 'iPhone 15 Pro 256G 远峰蓝', amount: 8999, status: '待发货' } },
+  { role: 'bot', text: '收到，已为您备注优先发货，请放心。还有其他需要帮忙的吗？' },
+]
+
+function seedMockConversation() {
+  const now = Date.now()
+  messages.value = MOCK_CHAT.map((m, index) => {
+    const base = { id: safeUuid(), at: now - (MOCK_CHAT.length - index) * 60000 }
+    if (m.object) {
+      return { ...base, role: m.role, type: 'object', objectType: m.object.type, payload: m.object }
+    }
+    return { ...base, role: m.role, type: 'text', text: m.text, suggestions: m.suggestions ?? null }
+  })
+}
+
 // ── 日期分组 ────────────────────────────────────────────────────────
 /**
  * 输出结构：
@@ -223,10 +248,14 @@ async function fetchHistory() {
     }
     if (seq === historySeq && sid === senderId.value.trim()) {
       setHistoryMessages(Array.isArray(data?.messages) ? data.messages : [])
+      /* 演示兜底：真实历史为空 → 展示虚拟对话 */
+      if (messages.value.length === 0) seedMockConversation()
     }
   } catch (error) {
     if (seq === historySeq) {
-      errorMessage.value = toFriendlyMessage(error, '加载历史消息失败，请稍后重试。')
+      /* 演示兜底：历史接口失败 → 虚拟对话（不向用户抛错误横幅） */
+      console.warn('[chat] 历史接口失败，回退演示对话：', error)
+      seedMockConversation()
     }
   } finally {
     if (seq === historySeq) {
@@ -243,6 +272,8 @@ function reset() {
   unreadCount.value = 0
   scrolledToBottom.value = true
   avatar.resetSpeech()
+  /* 新对话后同样回到虚拟对话演示态，页面不留空白 */
+  seedMockConversation()
 }
 
 async function sendPayload(payload) {

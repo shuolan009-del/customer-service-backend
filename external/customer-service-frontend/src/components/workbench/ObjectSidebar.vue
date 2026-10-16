@@ -13,10 +13,19 @@ import { useSidebar } from '../../composables/useSidebar'
 /**
  * 右侧「业务对象」栏：把订单 / 商品作为对象消息发给客服。
  * 卡片复用 MessageStream 同款 ObjectCard，保证流内流外观感一致。
+ *
+ * 可收起模式（2026-10-16）：collapsed=true 时整栏收为一条竖向轨道，
+ * 默认收起；点击轨道展开，展开态右上角按钮收回。
  */
 
+const props = defineProps({
+  /** true = 收起为竖向轨道 */
+  collapsed: { type: Boolean, default: false },
+})
+const emit = defineEmits(['toggle'])
+
 const { senderId, isSending, sendOrder, sendProduct } = useChat()
-const { orders, products, isLoading, error, activeTab, load } = useSidebar()
+const { orders, products, isLoading, error, isMock, activeTab, load } = useSidebar()
 
 const TABS = [
   { value: 'orders', label: '订单' },
@@ -45,22 +54,50 @@ function send(item) {
 </script>
 
 <template>
-  <aside class="sidebar">
+  <!-- 收起态：竖向轨道，点击展开 -->
+  <aside v-if="collapsed" class="sidebar sidebar--rail">
+    <button
+      type="button"
+      class="rail-btn"
+      title="展开业务对象"
+      aria-label="展开业务对象栏"
+      @click="emit('toggle')"
+    >
+      <Icon name="chevron-left" :size="16" />
+      <span class="rail-btn__label">业务对象</span>
+      <span class="rail-btn__count">{{ list.length }}</span>
+    </button>
+  </aside>
+
+  <!-- 展开态 -->
+  <aside v-else class="sidebar">
     <header class="sidebar__header">
       <h2 class="sidebar__title">
         <Icon name="list" :size="16" />
         <span>业务对象</span>
+        <span v-if="isMock" class="sidebar__mock" title="接口无数据或不可用时展示的内置演示数据">演示数据</span>
       </h2>
-      <AppButton
-        variant="ghost"
-        size="sm"
-        :loading="isLoading"
-        title="重新加载该 sender_id 的订单与商品"
-        aria-label="刷新业务对象列表"
-        @click="load(senderId)"
-      >
-        <template #icon><Icon name="refresh" :size="15" /></template>
-      </AppButton>
+      <div class="sidebar__actions">
+        <AppButton
+          variant="ghost"
+          size="sm"
+          :loading="isLoading"
+          title="重新加载该 sender_id 的订单与商品"
+          aria-label="刷新业务对象列表"
+          @click="load(senderId)"
+        >
+          <template #icon><Icon name="refresh" :size="15" /></template>
+        </AppButton>
+        <button
+          type="button"
+          class="iconbtn"
+          title="收起业务对象栏"
+          aria-label="收起业务对象栏"
+          @click="emit('toggle')"
+        >
+          <Icon name="chevron-right" :size="15" />
+        </button>
+      </div>
     </header>
 
     <SegmentedControl v-model="activeTab" :options="TABS" aria-label="业务对象类型" />
@@ -110,6 +147,7 @@ function send(item) {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  min-height: 0;
 }
 
 .sidebar__header {
@@ -127,6 +165,42 @@ function send(item) {
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
+}
+
+.sidebar__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-in-out), color var(--duration-fast) var(--ease-in-out);
+}
+.iconbtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* 「演示数据」标识 */
+.sidebar__mock {
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-warning-soft);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
 }
 
 .sidebar__hint {
@@ -163,5 +237,69 @@ function send(item) {
 /* 卡在窄栏里撑满宽度 */
 .sidebar__item :deep(.object-card) {
   width: 100%;
+}
+
+/* ── 收起态：竖向轨道 ─────────────────────────────────────────────── */
+.sidebar--rail {
+  padding: var(--space-2);
+}
+
+.rail-btn {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-in-out), color var(--duration-fast) var(--ease-in-out);
+}
+
+.rail-btn:hover {
+  background: var(--color-primary-soft-bg);
+  color: var(--color-primary);
+}
+
+.rail-btn__label {
+  writing-mode: vertical-rl;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.42em;
+}
+
+.rail-btn__count {
+  min-width: 22px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft-bg);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 窄屏堆叠时轨道改横向 */
+@media (max-width: 1179px) {
+  .sidebar--rail {
+    padding: var(--space-2);
+  }
+
+  .rail-btn {
+    flex-direction: row;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .rail-btn__label {
+    writing-mode: horizontal-tb;
+    letter-spacing: 0.24em;
+  }
 }
 </style>

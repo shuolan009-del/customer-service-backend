@@ -3,11 +3,11 @@ import userProfileAvatar from '../assets/userProfileAvatar.svg'
 
 /**
  * 客服 / 用户身份配置（工作台与会话记录共用，避免多处硬编码）。
- * 数字人形象名走《魔珐星云》的「小宝」，与后端无关。
+ * 展示名「小禾」；数字人 SDK 形象仍为《魔珐星云》的「小宝」，与后端无关。
  */
 
 export const customerService = {
-  name: '小宝',
+  name: '小禾',
   title: '金牌客服',
   status: '在线',
   avatar: xiaoerAvatar,

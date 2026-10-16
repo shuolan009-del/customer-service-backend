@@ -9,7 +9,7 @@
  *
  * 对话展示：按自然日分组的连续消息流（时间来源见 utils/timeline.js）。
  */
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppButton from '../components/ui/AppButton.vue'
 import AppField from '../components/ui/AppField.vue'
 import AppInput from '../components/ui/AppInput.vue'
@@ -28,6 +28,9 @@ import { readPrefs } from '../utils/prefs'
 const { senderId, reset, fetchHistory } = useChat()
 const { dispose, init: connectAvatar, humanReady, humanConnecting } = useAvatar()
 const { load: loadObjects } = useSidebar()
+
+/** 右侧业务对象栏收起态：默认收起（2026-10-16），点击轨道/按钮切换 */
+const sidebarCollapsed = ref(true)
 
 /** ?debug=1 → 消息流内显示分组位置与时间来源，便于核对「按天管理」是否生效 */
 const debug = computed(
@@ -82,7 +85,7 @@ onUnmounted(() => {
 
 <template>
   <div class="workbench">
-    <div class="workbench__grid">
+    <div class="workbench__grid" :class="{ 'workbench__grid--sbmin': sidebarCollapsed }">
       <AvatarPanel />
 
       <section class="chat-card">
@@ -137,7 +140,7 @@ onUnmounted(() => {
         <Composer />
       </section>
 
-      <ObjectSidebar />
+      <ObjectSidebar :collapsed="sidebarCollapsed" @toggle="sidebarCollapsed = !sidebarCollapsed" />
     </div>
   </div>
 </template>
@@ -158,6 +161,13 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: var(--wb-left) minmax(0, 1fr) var(--wb-right);
   gap: var(--wb-gap);
+  /* 收起/展开时右栏宽度平滑过渡（grid-template-columns 可动画） */
+  transition: grid-template-columns 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 收起态：右栏压成竖向轨道 */
+.workbench__grid--sbmin {
+  --wb-right: 56px;
 }
 
 .workbench__grid > * {
