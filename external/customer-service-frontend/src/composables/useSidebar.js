@@ -29,13 +29,18 @@ const error = ref('')
 const isMock = ref(false)
 const activeTab = ref('orders')
 
-export function useSidebar() {
-  /**
-   * 请求序号：快速切换 sender_id 时，先发的请求可能后返回。
-   * 过期响应直接丢弃，避免旧身份的订单/商品写进当前列表。
-   */
-  let loadSeq = 0
+/**
+ * 请求序号：快速切换 sender_id 时，先发的请求可能后返回。
+ * 过期响应直接丢弃，避免旧身份的订单/商品写进当前列表。
+ *
+ * ⚠️ 必须是模块级：orders / isLoading 等状态本就是模块级单例，而本 composable
+ * 被 WorkbenchView 与 ObjectSidebar 两处分别调用。若把计数放在 useSidebar() 内部，
+ * 两个组件各拿一个独立计数，谁也没法判另一个实例的请求是否已过期——
+ * 跨实例的旧响应会覆盖新数据（例如先切换 sender_id、再点侧栏刷新时）。
+ */
+let loadSeq = 0
 
+export function useSidebar() {
   async function load(senderId) {
     const sid = String(senderId ?? '').trim()
     orders.value = []
