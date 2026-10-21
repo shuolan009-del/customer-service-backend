@@ -1,4 +1,4 @@
-# 电商小二智能客服系统（customer-service-backend）
+# AI电商智能客服系统（customer-service-backend）
 
 电商场景的智能客服系统：基于 FastAPI 的对话引擎按意图三轨分流（任务流程 / 知识库 / 闲聊），
 集成魔珐星云数字人，配套 Vue 3 客服工作台前端。
